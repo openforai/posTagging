@@ -12,7 +12,7 @@ class TemplateFileName(object):
     
     def __init__(self, base, bench):
 
-        if(bench == 'brown'):
+        if(bench.lower() == 'brown'):
             self.baseBench = base + '/brown/'
             self.benchFiles = self.baseBench + 'brownBench.txt'
             
@@ -34,12 +34,20 @@ class TemplateFileName(object):
             self.benchRandTrain =  self.baseRandBench + 'trainingPhrases.txt'
             self.benchRandTrainInd =  self.baseRandBench + 'trainingPhrases_ind.txt'
             self.benchRandTest =  self.baseRandBench + 'testPhrases.txt'
-            self.benchRandTestParsed =  self.baseRandBench + 'testParsedPhrases.txt'
+            self.benchRandTestParsed =  self.baseRandBench + 'testParsedPhrases.txt'            
             self.benchRandError =  self.baseRandBench + 'brownErrors.txt'
             
             self.baseCrossBenchMain = self.baseBench + 'crossingTest/'
             self.tmpBenchCross = self.baseCrossBenchMain + 'tmpBenchCross'
             self.benchCrossFiles = self.baseCrossBenchMain + 'data/cross_{0}'
+            
+        elif(bench.lower() == 'penn'):
+            print("\n\n SORRY, \n\t PENN BENCHMARK IS NOT YET TREATED")
+            exit()
+            
+        else:
+            print("UNKNOW BENCHMARK NAME '{0}'. Please provide 'brown' or 'penn' : ".format(bench))
+            exit()
             
             
     def buildForCross(self, crossNum):
@@ -58,3 +66,23 @@ class TemplateFileName(object):
         self.benchCrossTestParsed =  self.baseCrossBenchSub + 'testParsedPhrases.txt'
         self.benchCrossError =  self.baseCrossBenchSub + 'brownErrors.txt'
         
+    
+    def builfResultFile(self, model, crossNum=0):
+        
+        if( model.lower() == 'blm'):
+            self.benchTestBase = self.baseBench + 'testResult/blm/'
+            self.benchRandResultTagging =  self.benchTestBase + 'resultRandTagging.txt'
+            self.benchCrossResultTagging =  self.benchTestBase + 'resultCrossTagging_{0}.txt'.format(crossNum)
+            
+        elif ( model.lower() == 'hmm'):
+            self.benchTestBase = self.baseBench + 'testResult/hmm/'
+            self.benchRandResultTagging =  self.benchTestBase + 'resultRandTagging.txt'
+            self.benchCrossResultTagging =  self.benchTestBase + 'resultCrossTagging_{0}.txt'.format(crossNum)
+        
+        elif ( model.lower() == 'enn'):
+            self.benchTestBase = self.baseBench + 'testResult/enn/'
+            self.benchRandResultTagging =  self.benchTestBase + 'resultRandTagging.txt'
+            self.benchCrossResultTagging =  self.benchTestBase + 'resultCrossTagging_{0}.txt'.format(crossNum)
+        
+        #print self.benchRandResultTagging
+        #print self.benchCrossResultTagging        
