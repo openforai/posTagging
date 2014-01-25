@@ -113,7 +113,7 @@ class HmmModel(object):
         tokens = _splitAndStrip(phrase)
         
         oseq = np.zeros( len(tokens), dtype=int)
-        newT = np.zeros( len(tokens), dtype = '|S25' )
+        newT = np.zeros( len(tokens), dtype = '|S50' )
         
         i = 0
         for tok in tokens :
@@ -146,7 +146,7 @@ class HmmModel(object):
         #print("Seq : {0}".format(oseq))
         #print("Best Path : {0}, p = {1}".format(bestPath[0], bestPath[1]))
     
-        res = np.zeros( len(bestPath[0]), dtype = '|S50' )
+        res = np.zeros( len(bestPath[0]), dtype = '|S60' )
         
         for i in range(len(bestPath[0])) :
             res[i] = tokens[i] + '/' + self.posSet[ bestPath[0][i] ]

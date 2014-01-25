@@ -40,11 +40,11 @@ if __name__ == '__main__':
         
     blm = baseLineNp.BaseLineModel(words, pos)
     
-    #blm.computeProb(tfn.benchRandTrainInd, maxLenPh)
+    blm.computeProb(tfn.benchRandTrainInd, maxLenPh)
     
     endInit = time.time()
     
-    #blm.tagging(tfn.benchRandTest, tfn.benchRandResultTagging)
+    blm.tagging(tfn.benchRandTest, tfn.benchRandResultTagging)
     
     end = time.time()
     
