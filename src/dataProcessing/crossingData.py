@@ -274,6 +274,8 @@ class CrossingData(object):
         
         print " Build Testing Data ... \n"
         
+        ex = r"^\d+((\.\d+)|(/\d+))?$"
+        
         with open(tfn.benchCrossTest, 'w') as btest, open(tfn.benchCrossTestParsed, 'w') as bparsed:
             
             for phrase in iop.getNextLine(tfn.benchCrossFiles.format(crossNum)):
@@ -288,6 +290,17 @@ class CrossingData(object):
                 phNotParsed = "" 
                 for wt in tmpWt:
                     w = wt.split('/')
+                    
+                    if (len(w) == 3):
+                            
+                        if (re.search(ex, w[0]+"/"+w[1]) is not None):
+                            w[0] = w[0]+"/"+w[1] #Fraction
+                            w[1] = w[2]
+                            w[2] = ""
+                        else:
+                            print "CRITICAL ERROR"
+                            exit()
+                    
                     phNotParsed = phNotParsed + w[0] + ' '
                 
                 btest.write(phNotParsed.strip())

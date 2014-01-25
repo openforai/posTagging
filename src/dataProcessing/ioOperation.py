@@ -34,6 +34,52 @@ def getNextLine(filePath):
                     yield newLine
                     
 
+def getNextTestedLine(tested, truth):
+    """ Read one line of phrase"""
+   
+    with open(tested, 'r') as testedFile,  open(truth, 'r') as truthfile:
+        
+        while True:
+        
+            boolTested = False
+            boolTruth = False
+            testedLine = ''
+            truthLine = ''
+                
+            while not boolTested:
+                
+                testedLine = testedFile.readline()
+                            
+                if not testedLine:
+                    #print('END OF FILE')
+                    break
+                
+                else: 
+                    testedLine = testedLine.strip()
+                            
+                    if( (testedLine != '\n') and (testedLine != '') ):                
+                        boolTested = True
+                        
+            while boolTested and not boolTruth:
+                
+                truthLine = truthfile.readline()
+                            
+                if not truthLine:
+                    #print('END OF FILE')
+                    break
+                
+                else: 
+                    truthLine = truthLine.strip()
+                            
+                    if( (truthLine != '\n') and (truthLine != '') ):                
+                        boolTruth = True
+                        
+            if boolTested and boolTruth:
+                yield (truthLine, testedLine)
+            else:
+                break
+                    
+
 
 def readDictionary(benchDico): 
     '''

@@ -97,6 +97,18 @@ class RandomData(object):
                     phNotParsed = "" 
                     for wt in tmpWt:
                         w = wt.split('/')
+                        w = wt.split('/')
+                    
+                        if (len(w) == 3):
+                                
+                            if (re.search(ex, w[0]+"/"+w[1]) is not None):
+                                w[0] = w[0]+"/"+w[1] #Fraction
+                                w[1] = w[2]
+                                w[2] = ""
+                            else:
+                                print "CRITICAL ERROR"
+                                exit()
+                            
                         phNotParsed = phNotParsed + w[0] + ' '
                     
                     btest.write(phNotParsed.strip())
