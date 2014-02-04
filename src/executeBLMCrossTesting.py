@@ -9,6 +9,7 @@ Created on Jan 24, 2014
 '''
 import sys
 import time
+import pickle
 
 import dataProcessing.ioOperation as iop
 import dataProcessing.templateFileName as templateFileName
@@ -45,13 +46,18 @@ if __name__ == '__main__':
         #nbDistinctwords = meta[2]  
         #nbPos = meta[4]    
             
-        blm = baseLineNp.BaseLineModel(words, pos)
+        blmTagger = baseLineNp.BaseLineModel(words, pos)
         
-        blm.computeProb(tfn.benchCrossTrainInd, maxLenPh)
+        blmTagger.computeProb(tfn.benchCrossTrainInd, maxLenPh)
+        
+        # Saved model
+        with open(tfn.blmModelCrossTagging, 'wb') as blmf:
+            blmfPickle = pickle.Pickler(blmf)
+            blmfPickle.dump(blmTagger)
         
         endInit = time.time()
         
-        blm.tagging(tfn.benchCrossTest, tfn.benchCrossResultTagging)
+        blmTagger.tagging(tfn.benchCrossTest, tfn.benchCrossResultTagging)
         
         end = time.time()
         

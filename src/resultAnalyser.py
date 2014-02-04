@@ -191,7 +191,10 @@ if __name__ == '__main__':
         words = iop.readWords(tfn.benchRandWords)
         pos = iop.readPos(tfn.benchRandCategories)
         
-        #confMatAllWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, pos)
+        print "All Words \n"
+        confMatAllWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, pos)
+        
+        print "Unknown Words \n"
         confMatUnknownWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, pos)
         
         for cnum in range(1, maxCross+1):
@@ -206,7 +209,10 @@ if __name__ == '__main__':
             words = iop.readWords(tfn.benchCrossWords)
             pos = iop.readPos(tfn.benchCrossCategories)
         
-            #confMatAllWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, pos)
+            print "All Words \n"
+            confMatAllWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, pos)
+            
+            print "Unknown Words \n"
             confMatUnknownWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, pos)
     
     

@@ -9,6 +9,7 @@ Created on Jan 24, 2014
 '''
 import sys
 import time
+import pickle
 
 import dataProcessing.ioOperation as iop
 import dataProcessing.templateFileName as templateFileName
@@ -49,6 +50,11 @@ if __name__ == '__main__':
         hmmTagger = hmmModelNp.HmmModel(words, pos)
         
         hmmTagger.computeInitialProb(tfn.benchCrossTrainInd, maxLenPh, nbPhrase, nbWords)
+        
+        # Saved model
+        with open(tfn.hmmModelCrossTagging, 'wb') as hmmf:
+            hmmfPickle = pickle.Pickler(hmmf)
+            hmmfPickle.dump(hmmTagger)
         
         endInit = time.time()
         
