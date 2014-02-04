@@ -8,6 +8,7 @@ Created on Jan 21, 2014
 @contact:  <adiks007@gmail.com>
 '''
 
+
 class TemplateFileName(object):
     
     def __init__(self, base, bench):
@@ -33,6 +34,8 @@ class TemplateFileName(object):
             self.benchRandWords = self.baseRandBench + 'words.pickle'
             self.benchRandTrain =  self.baseRandBench + 'trainingPhrases.txt'
             self.benchRandTrainInd =  self.baseRandBench + 'trainingPhrases_ind.txt'
+            self.benchRandTrainENNInd =  self.baseRandBench + 'trainingPhrasesENN_ind.txt'
+            self.benchRandValidENNInd =  self.baseRandBench + 'validationPhrases_ind.txt'
             self.benchRandTest =  self.baseRandBench + 'testPhrases.txt'
             self.benchRandTestParsed =  self.baseRandBench + 'testParsedPhrases.txt'            
             self.benchRandError =  self.baseRandBench + 'brownErrors.txt'
@@ -62,6 +65,8 @@ class TemplateFileName(object):
         self.benchCrossWords = self.baseCrossBenchSub + 'words.pickle'
         self.benchCrossTrain =  self.baseCrossBenchSub + 'trainingPhrases.txt'
         self.benchCrossTrainInd =  self.baseCrossBenchSub + 'trainingPhrases_ind.txt'
+        self.benchCrossTrainENNInd =  self.baseCrossBenchSub + 'trainingPhrasesENN_ind.txt'
+        self.benchCrossValidENNInd =  self.baseCrossBenchSub + 'validationPhrases_ind.txt'
         self.benchCrossTest =  self.baseCrossBenchSub + 'testPhrases.txt'
         self.benchCrossTestParsed =  self.baseCrossBenchSub + 'testParsedPhrases.txt'
         self.benchCrossError =  self.baseCrossBenchSub + 'brownErrors.txt'
@@ -73,16 +78,22 @@ class TemplateFileName(object):
             self.benchTestBase = self.baseBench + 'testResult/blm/'
             self.benchRandResultTagging =  self.benchTestBase + 'resultRandTagging.txt'
             self.benchCrossResultTagging =  self.benchTestBase + 'resultCrossTagging_{0}.txt'.format(crossNum)
+            self.blmModelRandTagging =  self.benchTestBase + 'models/blmModelRandTagging.pickle'
+            self.blmModelCrossTagging =  self.benchTestBase + 'models/blmModelCrossTagging_{0}.pickle'.format(crossNum)
             
         elif ( model.lower() == 'hmm'):
             self.benchTestBase = self.baseBench + 'testResult/hmm/'
             self.benchRandResultTagging =  self.benchTestBase + 'resultRandTagging.txt'
             self.benchCrossResultTagging =  self.benchTestBase + 'resultCrossTagging_{0}.txt'.format(crossNum)
+            self.hmmModelRandTagging =  self.benchTestBase + 'models/hmmModelRandTagging.pickle'
+            self.hmmModelCrossTagging =  self.benchTestBase + 'models/hmmModelCrossTagging_{0}.pickle'.format(crossNum)
         
         elif ( model.lower() == 'enn'):
             self.benchTestBase = self.baseBench + 'testResult/enn/'
             self.benchRandResultTagging =  self.benchTestBase + 'resultRandTagging.txt'
             self.benchCrossResultTagging =  self.benchTestBase + 'resultCrossTagging_{0}.txt'.format(crossNum)
+            self.ennModelRandTagging =  self.benchTestBase + 'models/ennModelRandTagging.pickle'
+            self.ennModelCrossTagging =  self.benchTestBase + 'models/ennModelCrossTagging_{0}.pickle'.format(crossNum)
         
         #print self.benchRandResultTagging
         #print self.benchCrossResultTagging        

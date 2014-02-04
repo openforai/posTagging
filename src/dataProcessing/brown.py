@@ -88,7 +88,7 @@ class BrownProcessing(object):
     #                             yield ph + ' ./.'
     
             
-    def brownInitialProcessing(self, tfn):
+    def brownInitialProcessing(self, tfn, nbData):
    
         '''
             This function build the new training data by removing extra pos
@@ -275,6 +275,13 @@ class BrownProcessing(object):
                     btagged.write(phrase)
                     btagged.write('\n')
                     btagged.write('\n')
+                
+                if( (nbPhrases % 1000) == 0):
+                    print ("\n\t- {0} phrases already registered.\n".format(nbPhrases))
+                    
+                if nbPhrases == nbData:
+                    print " \nMaximum data Saved.\n"
+                    break
                     
                                  
         # Write dictionary of words

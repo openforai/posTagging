@@ -20,7 +20,7 @@ mixture = ['nns+md', 'ppss+bez', 'ppss+bez*', 'rbr+cs', 'np+md', 'to+vb', 'in+pp
 
 alias = {'pn$':'pn', 'cd$':'cd', 'rb$':'rb', 'ap$':'ap', 'qlp':'ql', 'ppls':'ppl', 'rbt':'rb', 'nr$':'nr', 
          'nrs':'nr', 'ppss':'pps', 'jjr':'jj', 'jjt':'jj', 'jjs':'jj', 'jj$':'jj', 'np$':'np', 'nps':'np', 
-         'nps$':'np', 'dti': 'dt', 'dt$':'dt', 'dts':'dt', 'dtx':'dt', 'nns':'nm', 'nn$':'nn', 'nns$':'nn', 
+         'nps$':'np', 'dti': 'dt', 'dt$':'dt', 'dts':'dt', 'dtx':'dt', 'nns':'nn', 'nn$':'nn', 'nns$':'nn', 
          'rbr':'rb', 'hvd':'hv', 'hvz':'hv', 'hvn':'hv', 'hvg':'hv', 'hvd*':'hv*', 'hvz*':'hv*', 'bedz':'be', 
          'bez':'be', 'ber':'be', 'ben':'be', 'bed':'be', 'beg':'be', 'bem':'be', 'bem*':'be', 'bedz*':'be*', 
          'bez*':'be', 'ber*':'be*', 'bed*':'be*', 'dod':'do', 'doz':'do', 'dod*':'do*', 'doz*':'do*', 

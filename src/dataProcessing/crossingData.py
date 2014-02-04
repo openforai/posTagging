@@ -11,6 +11,8 @@ Created on Jan 22, 2014
 from random import randrange
 import re
 import pickle
+from math import ceil
+import os
 
 import ioOperation as iop
 import posSet
@@ -72,6 +74,14 @@ class CrossingData(object):
         
         print " Splitting Data ...\n"
         
+        for k in crossNum.keys(): # deleting file
+            
+            try:
+                os.remove(tfn.benchCrossFiles.format(k))
+                
+            except OSError:
+                pass
+        
         for ph in iop.getNextLine(tfn.benchTrain):
             
             for k in crossNum.keys():
@@ -80,6 +90,7 @@ class CrossingData(object):
                         fcross.write(ph)
                         fcross.write('\n')
                     ln += 1
+                    break
                         
                         
         print " Crossing Data Generation ended.\n"
@@ -320,5 +331,56 @@ class CrossingData(object):
             
         print " End With Crossing Data Building."
         
+
+    def splitValidationAndTrain(self, tfn, maxCross, percentage):
+        
+        print(" Build {0} Training and Validation data for ENN...".format(maxCross))
+        
+        for num in range(1, maxCross+1):
+            print " \n Crossing Folder :" + str(num) + "\n"
+            tfn.buildForCross(num)
+            
+            meta = iop.readMetaData(tfn.benchCrossMeta)
+        
+        #print(meta)
+        
+            nbPhrase = meta[0]
+            nbValidPh =  int( ceil( nbPhrase * percentage / 100 ) )
+            nbTrainPhrase = nbPhrase - nbValidPh
+            
+            print("Nb Phrase ", nbPhrase )
+            print("Nb Train Phrase ", nbTrainPhrase)
+            print("Nb Validation Phrase ", nbValidPh)
+            
+            i = 1
+            aleaNum = list()
+            
+            print('\n Generating random line number ... \n')
+            
+            while i <= nbValidPh:
+                tmpAlea = randrange(1, nbPhrase+1)
+                
+                if tmpAlea not in aleaNum:
+                    aleaNum.append(tmpAlea)
+                    i += 1
+                    
+            with open(tfn.benchCrossTrainENNInd, "w") as tennf, open(tfn.benchCrossValidENNInd, "w") as vldf:
+                
+                i = 1
+                
+                print( "\n Copying phrases ...")
+                
+                for ph in iop.getNextLine(tfn.benchCrossTrainInd):
+                    
+                    if i in aleaNum:
+                        vldf.write(ph)
+                        vldf.write('\n')                        
+                    else:
+                        tennf.write(ph)
+                        tennf.write('\n')
+                        
+                    i += 1
+                        
+            
         
                 

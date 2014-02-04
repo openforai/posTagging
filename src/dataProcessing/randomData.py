@@ -242,3 +242,50 @@ class RandomData(object):
     #     print("Words : ", words)
             
     # END OF buildTrainAndTest
+    
+    
+    def splitValidationAndTrain(self, tfn, percentage):
+        
+        print(" Build Training and Validation data for ENN...")
+               
+        meta = iop.readMetaData(tfn.benchRandMeta)
+    
+    #print(meta)
+    
+        nbPhrase = meta[0]
+        nbValidPh =  int( ceil( nbPhrase * percentage / 100 ) )
+        nbTrainPhrase = nbPhrase - nbValidPh
+        
+        print("Nb Phrase ", nbPhrase )
+        print("Nb Train Phrase ", nbTrainPhrase)
+        print("Nb Validation Phrase ", nbValidPh)
+        
+        i = 1
+        aleaNum = list()
+        
+        print('\n Generating random line number ... \n')
+        
+        while i <= nbValidPh:
+            tmpAlea = randrange(1, nbPhrase+1)
+            
+            if tmpAlea not in aleaNum:
+                aleaNum.append(tmpAlea)
+                i += 1
+                
+        with open(tfn.benchRandTrainENNInd, "w") as tennf, open(tfn.benchRandValidENNInd, "w") as vldf:
+            
+            i = 1
+            
+            print( "\n Copying phrases ...")
+            
+            for ph in iop.getNextLine(tfn.benchRandTrainInd):
+                
+                if i in aleaNum:
+                    vldf.write(ph)
+                    vldf.write('\n')                    
+                else:
+                    tennf.write(ph)
+                    tennf.write('\n')
+                    
+                i += 1
+                        
