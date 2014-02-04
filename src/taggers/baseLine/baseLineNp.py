@@ -131,7 +131,8 @@ class BaseLineModel(object):
                 rf.write("\n")
                 
                 i += 1
-       
+        
+        print ("\n\t- {0} phrases tagged.\n".format(i))
         print "\nTesting End. Result saved in " + resultFile
                 
                         
