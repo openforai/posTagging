@@ -15,6 +15,7 @@ from StringIO import StringIO
 
 import emlp
 import dataProcessing.ioOperation as iop
+import copy
 
 class ElasticNN(object):
     '''
@@ -144,8 +145,7 @@ class ElasticNN(object):
             klr += 1                        
        
         return inputs
-    
-    
+        
     
     def computeInitialProb(self, phrasesInd, length):
         '''
@@ -185,10 +185,7 @@ class ElasticNN(object):
         #print self.ew  
 
     def validate(self, validInd, maxLenPh, posL, posR):
-        
-        inputs = np.zeros( (maxLenPh, ((self.l+self.r+1)*self.nbPos)+1) )   
-        targets = np.zeros( (maxLenPh, self.nbPos ) )
-        
+       
         error = 0.0
         
         with open(validInd, "r") as vf:
@@ -199,13 +196,14 @@ class ElasticNN(object):
                 if not data:               
                     break
                 
-                array = np.genfromtxt(StringIO(data), dtype='int')
- 
+                array = np.genfromtxt(StringIO(data), dtype='int') 
                 
-                inputs.fill(0.0)
+                nbW = np.shape(np.where(array>-1))[1] / 2
+                inputs = np.zeros( (nbW, ((self.l+self.r+1)*self.nbPos)+1) )                   
+                targets = np.zeros( (nbW, self.nbPos ) )
+                
                 inputs[:,np.shape(inputs)[1]-1:] = -1 # bias input
-                targets.fill(0.0)                    
-                    
+               
                 self.buildInputAndTargetFromPhrase( inputs, targets, array, maxLenPh, posL, posR)
                 
                 outputs = self.eMlp.forward(inputs)
@@ -213,8 +211,7 @@ class ElasticNN(object):
                 error += 0.5 * np.sum( (targets-outputs) ** 2 )
                 
         return error 
-            
-                    
+                                
 
     def trainningSeq(self, phrasesInd, validInd, maxLenPh, nbPhrase, niteration=5):
         '''
@@ -222,15 +219,8 @@ class ElasticNN(object):
         '''
        
         print "Initialization of Training ..."
-        
-               
-        inputs = np.zeros( (maxLenPh, ((self.l+self.r+1)*self.nbPos)+1) )   
-        targets = np.zeros( (maxLenPh, self.nbPos ) )
+ 
         eta = 0.1
-        
-        old_val_error1 = 100002
-        old_val_error2 = 100001
-        new_val_error = 100000     
         
         shiftL = False
         posL = 1
@@ -254,7 +244,11 @@ class ElasticNN(object):
                 count = 0
                 old_val_error1 = 100002
                 old_val_error2 = 100001
-                new_val_error = 100000     
+                new_val_error = 100000
+                
+                minError = new_val_error
+                minModel = self.eMlp  
+                minCount = 0      
         
                 while (((old_val_error1 - new_val_error) > 0.001) or ((old_val_error2 - old_val_error1)>0.001)):
                     
@@ -277,13 +271,19 @@ class ElasticNN(object):
                                 break
                             
                             array = np.genfromtxt(StringIO(data), dtype='int')
-                            
-                            inputs.fill(0.0)
+                            nbW = np.shape(np.where(array>-1))[1] / 2
+                            inputs = np.zeros( (nbW, ((self.l+self.r+1)*self.nbPos)+1) )   
+                            targets = np.zeros( (nbW, self.nbPos ) )
+                            change = range(nbW)
+                                                        
                             inputs[:,np.shape(inputs)[1]-1:] = -1 # bias input
-                            targets.fill(0.0)                    
-                            
+                                                       
                             self.buildInputAndTargetFromPhrase( inputs, targets, array, maxLenPh, posL, posR)
                            
+                            np.random.shuffle(change)
+                            inputs = inputs[change,:]
+                            targets = targets[change,:]
+                            
                             #print inputs
                             #print targets
                             
@@ -294,11 +294,21 @@ class ElasticNN(object):
                     old_val_error2 = old_val_error1
                     old_val_error1 = new_val_error
                     
-                    print "\n Lunching validation ..."
+                    print "\n validation ..."
                     new_val_error = self.validate(validInd, maxLenPh, posL, posR)
                     
                     print " - (l,r) = ({0},{1}) : iter = {2}, Validation Error = {3}, Training Error {4}: ".format(posL, posR, count, new_val_error, self.eMlp.error)
 
+                    if new_val_error < minError :
+                        minModel = copy.deepcopy(self.eMlp)
+                        minError = new_val_error
+                        minCount = count
+                        print " - Minimal model set here."
+
+                print "\n - Restoring model for last minimal error : ", minError
+                self.eMlp = copy.deepcopy(minModel)
+                new_val_error = self.validate(validInd, maxLenPh, posL, posR)
+                print " - Validation (l,r) = ({0},{1}) : iter = {2}, Validation Error = {3}, Training Error {4}: ".format(posL, posR, minCount, new_val_error, self.eMlp.error)
 
 
     def trainningBatch(self, phrasesInd, validInd, maxLenPh, nbPhrase, niteration=5):
@@ -308,14 +318,7 @@ class ElasticNN(object):
        
         print "Initialization of Training ..."
         
-               
-        inputs = np.zeros( (maxLenPh, ((self.l+self.r+1)*self.nbPos)+1) )   
-        targets = np.zeros( (maxLenPh, self.nbPos ) )
         eta = 0.1
-        
-        old_val_error1 = 100002
-        old_val_error2 = 100001
-        new_val_error = 100000     
         
         shiftL = False
         posL = 1
@@ -339,7 +342,11 @@ class ElasticNN(object):
                 count = 0
                 old_val_error1 = 100002
                 old_val_error2 = 100001
-                new_val_error = 100000     
+                new_val_error = 100000
+                
+                minError = new_val_error
+                minModel = self.eMlp  
+                minCount = 0   
         
                 while (((old_val_error1 - new_val_error) > 0.001) or ((old_val_error2 - old_val_error1)>0.001)):
                     
@@ -363,11 +370,18 @@ class ElasticNN(object):
                             
                             array = np.genfromtxt(StringIO(data), dtype='int')
                             
-                            inputs.fill(0.0)
+                            nbW = np.shape(np.where(array>-1))[1] / 2
+                            inputs = np.zeros( (nbW, ((self.l+self.r+1)*self.nbPos)+1) )   
+                            targets = np.zeros( (nbW, self.nbPos ) )
+                            change = range(nbW)
+                            
                             inputs[:,np.shape(inputs)[1]-1:] = -1 # bias input
-                            targets.fill(0.0)                    
                             
                             self.buildInputAndTargetFromPhrase( inputs, targets, array, maxLenPh, posL, posR)
+                           
+                            np.random.shuffle(change)
+                            inputs = inputs[change,:]
+                            targets = targets[change,:]
                            
                             #print inputs
                             #print targets
@@ -381,13 +395,23 @@ class ElasticNN(object):
                     old_val_error2 = old_val_error1
                     old_val_error1 = new_val_error
                     
-                    print "\n Lunching validation ..."
+                    #print "\n Lunching  ..."
                     new_val_error = self.validate(validInd, maxLenPh, posL, posR)
                     
-                    print " - (l,r) = ({0},{1}) : iter = {2}, Validation Error = {3}, Training Error {4}: ".format(posL, posR, count, new_val_error, self.eMlp.error)
-
-
-
+                    print " - Validation (l,r) = ({0},{1}) : iter = {2}, Validation Error = {3}, Training Error {4}: ".format(posL, posR, count, new_val_error, self.eMlp.error)
+                    
+                    if new_val_error < minError :
+                        minModel = copy.deepcopy(self.eMlp)
+                        minError = new_val_error
+                        minCount = count
+                        print " - Minimal model set here."
+                        print " - Validation (l,r) = ({0},{1}) : iter = {2}, Validation Error = {3}, Training Error {4}: ".format(posL, posR, minCount, new_val_error, self.eMlp.error)
+                    
+                print "\n - Restoring model for last minimal error : ", minError
+                self.eMlp = copy.deepcopy(minModel)
+                new_val_error = self.validate(validInd, maxLenPh, posL, posR)
+                print " - Validation (l,r) = ({0},{1}) : iter = {2}, Validation Error = {3}, Training Error {4}: ".format(posL, posR, minCount, new_val_error, self.eMlp.error)
+            
         
     def tagging(self, testingFile, res):
         '''
@@ -476,9 +500,7 @@ class ElasticNN(object):
                 
                 nbt += 1
       
-            print ("\n\t- {0} phrases tagged.\n".format(i))
+            print ("\n\t- {0} phrases tagged.\n".format(nbt))
             print "\nTesting End. Result saved in " + res
-        
-        
         
         
