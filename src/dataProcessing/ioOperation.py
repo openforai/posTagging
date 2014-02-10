@@ -105,7 +105,8 @@ def readMetaData(benchMeta):
     meta[2] =  nbDistinctwords
     meta[3] =  nbWords
     meta[4] = nbCategories
-    meta[5] = nbError
+    meta[5] = NbAmbiguousWords
+    meta[6] = nbError
     '''
     print 'Fetching Meta Data ...'
     
@@ -129,6 +130,12 @@ def readMetaData(benchMeta):
     nbDistinctwords = int(meta["NbDistinctwords"])
     nbWords = int(meta["NbWords"])
     nbCategories = int(meta["NbCategories"])
+    
+    NbAmbiguousWords = 0
+    
+    if( "NbAmbiguousWords" in meta ):    
+        NbAmbiguousWords = int(meta["NbAmbiguousWords"])
+        
     nbError = int(meta["NbError"])
     
 #         print("Number Of Phrases ", nbPhrase )
@@ -136,9 +143,10 @@ def readMetaData(benchMeta):
 #         print("Number Of Distinct words ", nbDistinctwords)
 #         print("Number Of words ", nbWords)
 #         print("Number Of Categories ", nbCategories)
+#         print("Number Of Ambiguous Words ", NbAmbiguousWords)
 #         print("Number Of Error Phrases ", nbError)
     
-    return np.array([nbPhrase, maxLenPhrase, nbDistinctwords, nbWords, nbCategories, nbError])
+    return np.array([nbPhrase, maxLenPhrase, nbDistinctwords, nbWords, nbCategories, NbAmbiguousWords, nbError])
 
 
 def readWords(wf):
@@ -154,9 +162,22 @@ def readWords(wf):
     return words
 
 
+def readAmbiguousWords(awf):
+    
+    print "\nReading ambiguous words ...\n"
+    
+    with open(awf, 'rb') as w:
+        wPickle = pickle.Unpickler(w)
+        amwords = wPickle.load()
+    
+    #print("[words] : ", words )
+    
+    return amwords
+
+
 def readPos(cf):
     
-    print "\nReading Categories ...\n"
+    print "\nReading POS ...\n"
     with open(cf, 'rb') as c:
         cPickle = pickle.Unpickler(c)
         categories = cPickle.load()
@@ -164,6 +185,17 @@ def readPos(cf):
     #print("[categories] : ", categories )
     
     return categories
+
+def readPosFreq(cf):
+    
+    print "\nReading POS Frequences ...\n"
+    with open(cf, 'rb') as c:
+        cPickle = pickle.Unpickler(c)
+        posFreq = cPickle.load()
+    
+    #print("[categories] : ", categories )
+    
+    return posFreq
 
 
 def readOnePhrase(filePath):

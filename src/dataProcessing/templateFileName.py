@@ -20,9 +20,11 @@ class TemplateFileName(object):
             self.mainBenchBase = self.baseBench + 'mainData/'            
             self.benchWordsDico = self.mainBenchBase + 'brownWordsDico.pickle'
             self.benchPosDico = self.mainBenchBase + 'brownPosDico.pickle'
+            self.benchPosFreq = self.mainBenchBase + 'brownPosFreq.pickle'
             self.benchMeta =  self.mainBenchBase + 'brownMetaData.txt'
             self.benchCategories = self.mainBenchBase + 'brownCategories.pickle'
             self.benchWords = self.mainBenchBase + 'brownWords.pickle'
+            self.benchAmbiguousWords = self.mainBenchBase + 'brownAmbiguousWords.pickle'
             self.benchTrain =  self.mainBenchBase + 'brownAllPhrases.txt'
             self.benchError =  self.mainBenchBase + 'brownErrors.txt'
             
@@ -33,11 +35,14 @@ class TemplateFileName(object):
             self.benchRandCategories = self.baseRandBench + 'categories.pickle'
             self.benchRandWords = self.baseRandBench + 'words.pickle'
             self.benchRandTrain =  self.baseRandBench + 'trainingPhrases.txt'
+            self.benchRandTrainNotParsed =  self.baseRandBench + 'trainingPhrasesNotParsed.txt'
             self.benchRandTrainInd =  self.baseRandBench + 'trainingPhrases_ind.txt'
             self.benchRandTrainENNInd =  self.baseRandBench + 'trainingPhrasesENN_ind.txt'
             self.benchRandValidENNInd =  self.baseRandBench + 'validationPhrases_ind.txt'
             self.benchRandTest =  self.baseRandBench + 'testPhrases.txt'
+            #self.benchRandTest =  self.baseRandBench + 'trainingPhrasesNotParsed.txt'
             self.benchRandTestParsed =  self.baseRandBench + 'testParsedPhrases.txt'            
+            #self.benchRandTestParsed =  self.baseRandBench + 'trainingPhrases.txt'
             self.benchRandError =  self.baseRandBench + 'brownErrors.txt'
             
             self.baseCrossBenchMain = self.baseBench + 'crossingTest/'
@@ -64,6 +69,7 @@ class TemplateFileName(object):
         self.benchCrossCategories = self.baseCrossBenchSub + 'categories.pickle'
         self.benchCrossWords = self.baseCrossBenchSub + 'words.pickle'
         self.benchCrossTrain =  self.baseCrossBenchSub + 'trainingPhrases.txt'
+        self.benchCrossTrainNotParsed =  self.baseCrossBenchSub + 'trainingPhrasesNotParsed.txt'
         self.benchCrossTrainInd =  self.baseCrossBenchSub + 'trainingPhrases_ind.txt'
         self.benchCrossTrainENNInd =  self.baseCrossBenchSub + 'trainingPhrasesENN_ind.txt'
         self.benchCrossValidENNInd =  self.baseCrossBenchSub + 'validationPhrases_ind.txt'
@@ -72,7 +78,7 @@ class TemplateFileName(object):
         self.benchCrossError =  self.baseCrossBenchSub + 'brownErrors.txt'
         
     
-    def builfResultFile(self, model, crossNum=0):
+    def builfResultFile(self, model, crossNum=0, batch=True):
         
         if( model.lower() == 'blm'):
             self.benchTestBase = self.baseBench + 'testResult/blm/'
@@ -92,8 +98,13 @@ class TemplateFileName(object):
             self.benchTestBase = self.baseBench + 'testResult/enn/'
             self.benchRandResultTagging =  self.benchTestBase + 'resultRandTagging.txt'
             self.benchCrossResultTagging =  self.benchTestBase + 'resultCrossTagging_{0}.txt'.format(crossNum)
-            self.ennModelRandTagging =  self.benchTestBase + 'models/ennModelRandTagging.pickle'
-            self.ennModelCrossTagging =  self.benchTestBase + 'models/ennModelCrossTagging_{0}.pickle'.format(crossNum)
+            
+            if batch :
+                self.ennModelRandTagging =  self.benchTestBase + 'models/ennBatchModelRandTagging.pickle'
+                self.ennModelCrossTagging =  self.benchTestBase + 'models/ennBatchModelCrossTagging_{0}.pickle'.format(crossNum)
+            else:
+                self.ennModelRandTagging =  self.benchTestBase + 'models/ennSeqModelRandTagging.pickle'
+                self.ennModelCrossTagging =  self.benchTestBase + 'models/ennSeqModelCrossTagging_{0}.pickle'.format(crossNum)
         
         #print self.benchRandResultTagging
         #print self.benchCrossResultTagging        

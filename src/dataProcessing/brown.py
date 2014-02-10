@@ -109,8 +109,12 @@ class BrownProcessing(object):
         words = list()
         words.append(posSet.numberMarquee) # represent all the numbers
         
+        ambigousWords = list()
+        posFreq = dict()
+        
         nbPhrases = 0
-        nbWords = 0        
+        nbWords = 0
+        nbAmbWords = 0        
         nbErrors = 0
         
         maxPhLen = 0
@@ -241,7 +245,15 @@ class BrownProcessing(object):
                                 
                                 if temp[1] not in pos :
                                     pos.append(temp[1])
-                                    wordsDico[temp[0]] = pos 
+                                    wordsDico[temp[0]] = pos
+                                    
+                                    if( len(pos) == 2): # This will appear one time
+                                        
+                                        #if( (temp[0] not in ambigousWords) and (re.search(ex, str(temp[0])) is None) ):
+                                            ambigousWords.append(temp[0])
+                                            #print "ambiguous"
+                                if( len(pos) >= 2 ):
+                                    nbAmbWords += 1
                                     
                                     #print("\t [UPDATED] " + temp[0] + " >>> ADDED " + temp[1] + "\n")
                             else:
@@ -265,7 +277,16 @@ class BrownProcessing(object):
                                 posDico[temp[1]] = wordsTemp
                                 #nbDistinctWords += 1
                                 
-                                #print("\t [NEW] " + temp[1] + " >>> ADDED " + temp[0] + "\n")             
+                                #print("\t [NEW] " + temp[1] + " >>> ADDED " + temp[0] + "\n")  
+                                
+                            if( posFreq.has_key( temp[1] ) ):
+                                freq = posDico.get(temp[1])
+                                posFreq[temp[1]] = posFreq.get(temp[1]) + 1 
+                                    
+                                    #print("\t [UPDATED] " + temp[1] + " >>> ADDED " + temp[0] + "\n")
+                            else:
+                                
+                                posFreq[temp[1]] = 1
                 
                     #maxPhLen = tmpMaxPhLen > maxPhLen ? tmpMaxPhlen : maxPhLen
                     
@@ -283,6 +304,7 @@ class BrownProcessing(object):
                     print " \nMaximum data Saved.\n"
                     break
                     
+        print ("\n\t- {0} phrases registered.\n".format(nbPhrases))
                                  
         # Write dictionary of words
         with open(tfn.benchWordsDico, 'wb') as bwdico:
@@ -300,11 +322,23 @@ class BrownProcessing(object):
             bcatsPickle.dump(categories)
             #print categories
             
+        # write categories
+        with open(tfn.benchPosFreq, 'wb') as bcatsFreq:
+            bcatsFreqPickle = pickle.Pickler(bcatsFreq)
+            bcatsFreqPickle.dump(posFreq)
+            #print posFreq
+            
         # write words
         with open(tfn.benchWords, 'wb') as bwords:
             bwordsPickle = pickle.Pickler(bwords)
             bwordsPickle.dump(words)
             #print words
+            
+        # write ambiguous words
+        with open(tfn.benchAmbiguousWords, 'wb') as bambWords:
+            bambWordsPickle = pickle.Pickler(bambWords)
+            bambWordsPickle.dump(ambigousWords)
+            #print ambigousWords
         
         # write metadata        
         with open(tfn.benchMeta, 'w') as bmeta:
@@ -313,6 +347,7 @@ class BrownProcessing(object):
             phrase = phrase + "\nNbDistinctwords : " + str(len(words))            
             phrase = phrase + "\nNbWords : " + str(nbWords)
             phrase = phrase + "\nNbCategories : " + str(len(categories))
+            phrase = phrase + "\nNbAmbiguousWords : " + str(nbAmbWords)
             phrase = phrase + "\nNbError : " + str(nbErrors)
             
             bmeta.write(phrase)

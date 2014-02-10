@@ -39,6 +39,7 @@ class RandomData(object):
         categories = list()
         words = list()
         words.append(posSet.numberMarquee) # represent all the numbers
+        ambiguesWords = list()
         
         nbPhrases = 0
         nbWords = 0
@@ -80,7 +81,7 @@ class RandomData(object):
         
         print " Randomly Splitting Data ... \n"
         
-        with open(tfn.benchRandTrain, 'w') as btrain, open(tfn.benchRandTest, 'w') as btest, open(tfn.benchRandTestParsed, 'w') as bparsed:
+        with open(tfn.benchRandTrain, 'w') as btrain, open(tfn.benchRandTrainNotParsed, 'w') as btrainNotParsed,  open(tfn.benchRandTest, 'w') as btest, open(tfn.benchRandTestParsed, 'w') as bparsed:
             
             i = 1
             
@@ -90,15 +91,12 @@ class RandomData(object):
                 #print phrase                  
                 
                 if i in aleaNum:
-                    bparsed.write(phrase)
-                    bparsed.write('\n\n')
                     
                     tmpWt = phrase.split(' ')
                     phNotParsed = "" 
                     for wt in tmpWt:
                         w = wt.split('/')
-                        w = wt.split('/')
-                    
+                                            
                         if (len(w) == 3):
                                 
                             if (re.search(ex, w[0]+"/"+w[1]) is not None):
@@ -114,6 +112,8 @@ class RandomData(object):
                     btest.write(phNotParsed.strip())
                     btest.write('\n\n')
                     
+                    bparsed.write(phrase)
+                    bparsed.write('\n\n')                      
                                 
                 else:                    
                             
@@ -143,6 +143,8 @@ class RandomData(object):
                                     print "CRITICAL ERROR"
                                     exit()
                            
+                            phNotParsed = phNotParsed + " " + temp[0]
+                            
                             if( temp[1] not in categories ):
                                 categories.append(temp[1])
                                 
@@ -191,6 +193,11 @@ class RandomData(object):
                     
                     btrain.write(phrase)
                     btrain.write('\n\n')
+                    
+                    phNotParsed = phNotParsed.strip()
+                    
+                    btrainNotParsed.write(phNotParsed)
+                    btrainNotParsed.write('\n\n')
                 
                 i += 1
               
