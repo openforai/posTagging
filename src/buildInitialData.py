@@ -38,7 +38,6 @@ bp = brown.BrownProcessing(tfn.benchFiles, tfn.baseBench)
 
 bp.brownInitialProcessing(tfn, nbData)
 
-
 rd = randomData.RandomData()
 
 rd.buildTrainAndTestData(tfn, percentage)

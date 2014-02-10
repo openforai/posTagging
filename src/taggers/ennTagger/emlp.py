@@ -68,6 +68,7 @@ class EMLP:
         
         self.uphidw.fill(0.0)
         self.upoutw.fill(0.0)
+        self.error = 0.0
         
         #print " New hidden : ", self.nacthidden
     
@@ -131,7 +132,7 @@ class EMLP:
         
         self.error = 0.5*np.sum((targets-self.outputs)**2)
         
-        #print " Error : ", self.error                
+        #print " Error In Training: ", self.error                
         
         #deltao = (targets-self.outputs)*self.outputs*(1.0-self.outputs)
         deltao = (targets-self.outputs)*(1.0-self.outputs**2)
@@ -151,8 +152,8 @@ class EMLP:
                    
     def weightUpdate(self):
         
-        self.uphidw += self.tempuphidw + self.momentum*self.uphidw
-        self.upoutw += self.tempupoutw + self.momentum*self.upoutw
+        self.uphidw = self.tempuphidw + self.momentum*self.uphidw
+        self.upoutw = self.tempupoutw + self.momentum*self.upoutw
         
         self.hidw += self.uphidw
         self.outw += self.upoutw
@@ -164,7 +165,7 @@ class EMLP:
         #print self.outw
         
         
-    def fwdBackwd2(self, inputs, targets, eta):
+    def fwdBackwdBatch(self, inputs, targets, eta):
         
         out = self.forward(inputs)
         
@@ -180,6 +181,17 @@ class EMLP:
         #print out
         
         self.backward(inputs, targets, eta)
+        
+    
+    def saveWeight(self):
+        
+        self.hidwSaved = self.hidw
+        self.outwSaved = self.outw
+        
+    def restoreOldWeight(self):
+        
+        self.hidwd = self.hidwSave
+        self.outw = self.outwSaved
         
         
     def confmat(self,inputs,targets):

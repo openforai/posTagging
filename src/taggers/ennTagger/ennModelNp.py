@@ -216,7 +216,7 @@ class ElasticNN(object):
             
                     
 
-    def trainning(self, phrasesInd, validInd, maxLenPh, nbPhrase):
+    def trainningSeq(self, phrasesInd, validInd, maxLenPh, nbPhrase, niteration=5):
         '''
         Train Elastic Neural Network
         '''
@@ -249,53 +249,142 @@ class ElasticNN(object):
                 
                 print " \n \tLearning for (l,r) = ({0},{1})".format(posL,posR)
                 
+                self.eMlp.updateLR(posL, posR) # Increase current l and r
+                
                 count = 0
                 old_val_error1 = 100002
                 old_val_error2 = 100001
                 new_val_error = 100000     
         
                 while (((old_val_error1 - new_val_error) > 0.001) or ((old_val_error2 - old_val_error1)>0.001)):
-                    count+=1
-                
-                    f.seek(0,0) # move the pointer at the beginning
-                    self.eMlp.updateLR(posL, posR) # Increase current l and r
                     
-                    print " \n Lunching Iteration : ", count, " ..."
+                    self.eMlp.updateLR(posL, posR) # Here just the updated weight value will be fill to 0.0
+                    
+                    for tour in range(niteration):
+                                                                    
+                        count+=1
+                    
+                        f.seek(0,0) # move the pointer at the beginning
                         
-                    while True:
                         
-                        data = f.readline()
-                        
-                        if not data:               
-                            break
-                        
-                        array = np.genfromtxt(StringIO(data), dtype='int')
-                        
-                        inputs.fill(0.0)
-                        inputs[:,np.shape(inputs)[1]-1:] = -1 # bias input
-                        targets.fill(0.0)                    
-                        
-                        self.buildInputAndTargetFromPhrase( inputs, targets, array, maxLenPh, posL, posR)
-                       
-                        #print inputs
-                        #print targets
-                        
-                        #break
-                        
-                        self.eMlp.fwdBackwd(inputs, targets, eta)                    
-                
-                        #self.eMlp.weightUpdate() # used if self.eMlp.fwdBackwd2 is used above
-                        
-                        #break
-                        
+                        print " \n Lunching Iteration : ", count, " ..."
+                            
+                        while True:
+                            
+                            data = f.readline()
+                            
+                            if not data:               
+                                break
+                            
+                            array = np.genfromtxt(StringIO(data), dtype='int')
+                            
+                            inputs.fill(0.0)
+                            inputs[:,np.shape(inputs)[1]-1:] = -1 # bias input
+                            targets.fill(0.0)                    
+                            
+                            self.buildInputAndTargetFromPhrase( inputs, targets, array, maxLenPh, posL, posR)
+                           
+                            #print inputs
+                            #print targets
+                            
+                            self.eMlp.fwdBackwd(inputs, targets, eta)                    
+                    
+                            # End Of Iteration
+                            
                     old_val_error2 = old_val_error1
                     old_val_error1 = new_val_error
                     
                     print "\n Lunching validation ..."
                     new_val_error = self.validate(validInd, maxLenPh, posL, posR)
                     
-                    print " - (l,r) = ({0},{1}) : iter = {2}, error = {3}".format(posL, posR, count, new_val_error)
+                    print " - (l,r) = ({0},{1}) : iter = {2}, Validation Error = {3}, Training Error {4}: ".format(posL, posR, count, new_val_error, self.eMlp.error)
 
+
+
+    def trainningBatch(self, phrasesInd, validInd, maxLenPh, nbPhrase, niteration=5):
+        '''
+        Train Elastic Neural Network
+        '''
+       
+        print "Initialization of Training ..."
+        
+               
+        inputs = np.zeros( (maxLenPh, ((self.l+self.r+1)*self.nbPos)+1) )   
+        targets = np.zeros( (maxLenPh, self.nbPos ) )
+        eta = 0.1
+        
+        old_val_error1 = 100002
+        old_val_error2 = 100001
+        new_val_error = 100000     
+        
+        shiftL = False
+        posL = 1
+        posR = 0
+        
+        with open(phrasesInd, 'r') as f:
+            
+            for size in range(1, self.r + self.l):
+                    
+                if shiftL :
+                    posL += 1
+                    shiftL = False
+                else :
+                    posR += 1
+                    shiftL = True
+                
+                print " \n \tLearning for (l,r) = ({0},{1})".format(posL,posR)
+                
+                self.eMlp.updateLR(posL, posR) # Increase current l and r
+                
+                count = 0
+                old_val_error1 = 100002
+                old_val_error2 = 100001
+                new_val_error = 100000     
+        
+                while (((old_val_error1 - new_val_error) > 0.001) or ((old_val_error2 - old_val_error1)>0.001)):
+                    
+                    self.eMlp.updateLR(posL, posR) # Here just the updated weight value will be fill to 0.0
+                    
+                    for tour in range(niteration):
+                    
+                        count+=1
+                    
+                        f.seek(0,0) # move the pointer at the beginning
+                        
+                        
+                        print " \n Lunching Iteration : ", count, " ..."
+                            
+                        while True:
+                            
+                            data = f.readline()
+                            
+                            if not data:               
+                                break
+                            
+                            array = np.genfromtxt(StringIO(data), dtype='int')
+                            
+                            inputs.fill(0.0)
+                            inputs[:,np.shape(inputs)[1]-1:] = -1 # bias input
+                            targets.fill(0.0)                    
+                            
+                            self.buildInputAndTargetFromPhrase( inputs, targets, array, maxLenPh, posL, posR)
+                           
+                            #print inputs
+                            #print targets
+                            
+                            self.eMlp.fwdBackwdBatch(inputs, targets, eta)                    
+                    
+                            self.eMlp.weightUpdate() # used if self.eMlp.fwdBackwd2 is used above
+                            
+                            # End Of Iteration
+                            
+                    old_val_error2 = old_val_error1
+                    old_val_error1 = new_val_error
+                    
+                    print "\n Lunching validation ..."
+                    new_val_error = self.validate(validInd, maxLenPh, posL, posR)
+                    
+                    print " - (l,r) = ({0},{1}) : iter = {2}, Validation Error = {3}, Training Error {4}: ".format(posL, posR, count, new_val_error, self.eMlp.error)
 
 
 
@@ -309,15 +398,16 @@ class ElasticNN(object):
         
         with open(res, 'w') as rf:
             
-            i = 0
+            nbt = 0
             n = 1000
+            mostTag = np.zeros(self.nbPos, dtype='int')
         
             for phrase in iop.getNextLine(testingFile):
                 
                 #print phrase
                 
-                if( np.mod(i, n) == 0):
-                    print ("\n\t- {0} phrases already tagged.\n".format(i))
+                if( np.mod(nbt, n) == 0):
+                    print ("\n\t- {0} phrases already tagged.\n".format(nbt))
                                 
                 phraseRes = ""
                 
@@ -333,13 +423,17 @@ class ElasticNN(object):
                     newR = self.r
                     shiftL = False
                     
+                    mostTag.fill(0)
+                    
                     while( (not tagged) and ((newL+newR)>0)):
                
                         inputs= self.buildTestingInputFromPhrase(tokens, i, newL, newR)                
                     
                         out = self.eMlp.forward(inputs)
                         
-                        tag = np.where(out == 1)
+                        tag = np.where(out >= 0.5)
+                        mostTag[tag[1]] += 1
+                        
                     
                         #print tag
                         
@@ -350,7 +444,7 @@ class ElasticNN(object):
                             
                             tagged = True
                             
-                            print tokens[i] + "/" + pos
+                            #print tokens[i] + "/" + pos
                             
                         if shiftL :
                             newL -= 1
@@ -360,7 +454,19 @@ class ElasticNN(object):
                             shiftL = True
                             
                     if not tagged : # UNKNOWN TAG
-                        phraseRes = phraseRes + " " + tokens[i] + "/" + "UnknownPOS"
+                        
+                        #print mostTag
+                        
+                        posi = np.argmax( mostTag )
+                        
+                        if( ((posi == 0) and (mostTag[0] > 0)) or (posi != 0) ):
+                            pos = self.posSet[posi]
+                       
+                            phraseRes = phraseRes + " " + tokens[i] + "/" + pos
+                            #print tokens[i] + "/" + pos
+                            #print posi, mostTag[posi]
+                        else:                       
+                            phraseRes = phraseRes + " " + tokens[i] + "/" + "UnknownPOS"
                         
                 phraseRes = phraseRes.strip()
                
@@ -368,7 +474,7 @@ class ElasticNN(object):
                 rf.write(phraseRes)
                 rf.write("\n")
                 
-                i += 1
+                nbt += 1
       
             print ("\n\t- {0} phrases tagged.\n".format(i))
             print "\nTesting End. Result saved in " + res
