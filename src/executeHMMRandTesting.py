@@ -22,7 +22,8 @@ if __name__ == '__main__':
     
     base = sys.argv[1]
     bench = sys.argv[2]
-    #print crossNum
+    trainModel = True
+    
     
     print("\nHMM Tagger testing ...\n")
 
@@ -31,23 +32,33 @@ if __name__ == '__main__':
     
     start = time.time()
     
-    words = iop.readWords(tfn.benchRandWords)
-    pos = iop.readPos(tfn.benchRandCategories)
-      
-    meta = iop.readMetaData(tfn.benchRandMeta)
-    nbPhrase = meta[0]
-    maxLenPh = meta[1]      
-    nbWords = meta[3]  
-    #nbPos = meta[4]
+    if( trainModel ): 
         
-    hmmTagger = hmmModelNp.HmmModel(words, pos)
-    
-    hmmTagger.computeInitialProb(tfn.benchRandTrainInd, maxLenPh, nbPhrase, nbWords)
-    
-    # Saved model
-    with open(tfn.hmmModelRandTagging, 'wb') as hmmf:
-        hmmfPickle = pickle.Pickler(hmmf)
-        hmmfPickle.dump(hmmTagger)
+        words = iop.readWords(tfn.benchRandWords)
+        pos = iop.readPos(tfn.benchRandCategories)
+          
+        meta = iop.readMetaData(tfn.benchRandMeta)
+        nbPhrase = meta[0]
+        maxLenPh = meta[1]      
+        nbWords = meta[3]  
+        #nbPos = meta[4]
+       
+        hmmTagger = hmmModelNp.HmmModel(words, pos)
+        
+        hmmTagger.computeInitialProb(tfn.benchRandTrainInd, maxLenPh, nbPhrase, nbWords)
+        
+        # Saved model
+        with open(tfn.hmmModelRandTagging, 'wb') as hmmf:
+            hmmfPickle = pickle.Pickler(hmmf)
+            hmmfPickle.dump(hmmTagger)
+            
+    else:
+        
+        print " Reading saved model at : ", tfn.hmmModelRandTagging
+        
+        with open(tfn.hmmModelRandTagging, 'rb') as w:
+            wPickle = pickle.Unpickler(w)
+            hmmTagger = wPickle.load()
     
     endInit = time.time()
     

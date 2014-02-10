@@ -23,8 +23,8 @@ if __name__ == '__main__':
     base = sys.argv[1]
     bench = sys.argv[2]
     maxCross = int(sys.argv[3])
-    #print crossNum
-    
+    trainModel = True
+        
     print("\nBase Line testing ...\n")
 
     tfn = templateFileName.TemplateFileName(base, bench)
@@ -38,22 +38,31 @@ if __name__ == '__main__':
         
         start = time.time()
         
-        words = iop.readWords(tfn.benchCrossWords)
-        pos = iop.readPos(tfn.benchCrossCategories)
-          
-        meta = iop.readMetaData(tfn.benchCrossMeta)
-        maxLenPh = meta[1]
-        #nbDistinctwords = meta[2]  
-        #nbPos = meta[4]    
+        if trainModel :
+            words = iop.readWords(tfn.benchCrossWords)
+            pos = iop.readPos(tfn.benchCrossCategories)
+              
+            meta = iop.readMetaData(tfn.benchCrossMeta)
+            maxLenPh = meta[1]
+            #nbDistinctwords = meta[2]  
+            #nbPos = meta[4]    
+                
+            blmTagger = baseLineNp.BaseLineModel(words, pos)
             
-        blmTagger = baseLineNp.BaseLineModel(words, pos)
-        
-        blmTagger.computeProb(tfn.benchCrossTrainInd, maxLenPh)
-        
-        # Saved model
-        with open(tfn.blmModelCrossTagging, 'wb') as blmf:
-            blmfPickle = pickle.Pickler(blmf)
-            blmfPickle.dump(blmTagger)
+            blmTagger.computeProb(tfn.benchCrossTrainInd, maxLenPh)
+            
+            # Saved model
+            with open(tfn.blmModelCrossTagging, 'wb') as blmf:
+                blmfPickle = pickle.Pickler(blmf)
+                blmfPickle.dump(blmTagger)
+                
+        else:
+            
+            print " Reading saved model at : ", tfn.blmModelCrossTagging
+            
+            with open(tfn.blmModelCrossTagging, 'rb') as w:
+                wPickle = pickle.Unpickler(w)
+                blmTagger = wPickle.load()
         
         endInit = time.time()
         

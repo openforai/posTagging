@@ -23,7 +23,8 @@ if __name__ == '__main__':
     base = sys.argv[1]
     bench = sys.argv[2]
     maxCross = int(sys.argv[3])
-    #print crossNum
+    trainModel = True
+    
     
     print("\nHMM Tagger testing ...\n")
 
@@ -38,23 +39,31 @@ if __name__ == '__main__':
         
         start = time.time()
         
-        words = iop.readWords(tfn.benchCrossWords)
-        pos = iop.readPos(tfn.benchCrossCategories)
-          
-        meta = iop.readMetaData(tfn.benchCrossMeta)
-        nbPhrase = meta[0]
-        maxLenPh = meta[1]      
-        nbWords = meta[3]  
-        #nbPos = meta[4]
+        if( trainModel ): 
+            words = iop.readWords(tfn.benchCrossWords)
+            pos = iop.readPos(tfn.benchCrossCategories)
+              
+            meta = iop.readMetaData(tfn.benchCrossMeta)
+            nbPhrase = meta[0]
+            maxLenPh = meta[1]      
+            nbWords = meta[3]  
+            #nbPos = meta[4]
+                
+            hmmTagger = hmmModelNp.HmmModel(words, pos)
             
-        hmmTagger = hmmModelNp.HmmModel(words, pos)
-        
-        hmmTagger.computeInitialProb(tfn.benchCrossTrainInd, maxLenPh, nbPhrase, nbWords)
-        
-        # Saved model
-        with open(tfn.hmmModelCrossTagging, 'wb') as hmmf:
-            hmmfPickle = pickle.Pickler(hmmf)
-            hmmfPickle.dump(hmmTagger)
+            hmmTagger.computeInitialProb(tfn.benchCrossTrainInd, maxLenPh, nbPhrase, nbWords)
+            
+            # Saved model
+            with open(tfn.hmmModelCrossTagging, 'wb') as hmmf:
+                hmmfPickle = pickle.Pickler(hmmf)
+                hmmfPickle.dump(hmmTagger)
+        else:
+            
+            print " Reading saved model at : ", tfn.hmmModelCrossTagging
+            
+            with open(tfn.hmmModelCrossTagging, 'rb') as w:
+                wPickle = pickle.Unpickler(w)
+                hmmTagger = wPickle.load()
         
         endInit = time.time()
         
