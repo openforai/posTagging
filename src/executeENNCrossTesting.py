@@ -34,7 +34,7 @@ if __name__ == '__main__':
     
     #for crossNum in range(1, maxCross+1):
         
-    print "\n\n HMM Line Cross Testing " + str(crossNum)
+    print "\n\n ENN Line Cross Testing " + str(crossNum)
     
     tfn.buildForCross(crossNum)
     tfn.builfResultFile('enn', crossNum, batch = batchTraining)
