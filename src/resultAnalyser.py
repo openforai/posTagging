@@ -154,6 +154,59 @@ def confMatAllWords(testRes, testTrue, words, pos):
     #print conf
     #print "Percentage Correct: ",np.trace(conf)/np.sum(conf)*100
     return conf
+
+
+def confMatKnownWords(testRes, testTrue, words, pos):
+    
+    #print "\n Computing Confusion matrice for unknown words..."
+    
+    conf = np.zeros((len(pos), len(pos)), dtype='int')
+    ex = r"^\d+((\.\d+)|(/\d+))?$"
+    count = 0
+    for resTrue, resTested in iop.getNextTestedLine(testRes, testTrue):
+        
+        #print resTested
+        #print resTrue
+        #print "\n\n"
+        
+        trueWords = resTrue.strip().split(" ");
+        testedWords = resTested.strip().split(" ");
+        
+        if( len(trueWords) != len(testedWords)):
+            print " \n\n AN ERROR ENCOUNTERED WITH PHRASES LENGTH. SKIPPED : \n"
+            print resTested
+            print resTrue
+            print testRes
+            continue
+        
+        for c in range( len(trueWords) ):
+            
+            (tested, truth, state) = formatTag(testRes, testedWords[c], resTested, trueWords[c], resTrue, words, pos)
+            
+            if( state ) :
+            
+                if (re.search(ex, tested[0]) is not None):            
+                    tested[0] = '0'
+            
+                if (tested[0] in words) :                    
+                        
+                    if ( tested[1] in pos ) :    
+                        j = pos.index(tested[1])
+                    else :
+                        j = len(pos) - 1
+                        #print " Words not handled : ", tested, truth
+                    
+                    if  ( truth[1] in pos ) :
+                        i = pos.index(truth[1])
+                    else :
+                        i = len(pos) - 1
+                                        
+                    conf[i, j] += 1
+                    count += 1
+                   
+    #print conf
+    #print "Percentage Correct: ",np.trace(conf)/np.sum(conf)*100
+    return conf
      
 
 def confMatUnknownWords(testRes, testTrue, words, pos):
@@ -307,6 +360,10 @@ def randResultAnalysis(tfn, model ):
             conf = confMatAllWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, pos)
             print"\t\t - Percentage = ", float(np.trace(conf[:-1,:-1]))/np.sum(conf[:-1,:])*100
             
+            print "\n---> Known Words : "
+            conf = confMatKnownWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, pos)
+            print"\n\t\t - Percentage = ", float(np.trace(conf[:-1,:-1]))/np.sum(conf[:-1,:])*100
+            
             print "\n---> Unknown Words : "
             conf = confMatUnknownWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, pos)
             print"\n\t\t - Percentage = ", float(np.trace(conf[:-1,:-1]))/np.sum(conf[:-1,:])*100
@@ -326,6 +383,12 @@ def randResultAnalysis(tfn, model ):
                     
             print "\n\n---> All Words For Most POS : "
             conf = confMatAllWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, mostPos)
+            print"\t\t - Percentage = ", float(np.trace(conf[:-1,:-1]))/np.sum(conf[:-1,:])*100
+            print"\t\t - Conf Mat : "
+            print conf
+            
+            print "---> Known Words For Most POS : "
+            conf = confMatKnownWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, mostPos)
             print"\t\t - Percentage = ", float(np.trace(conf[:-1,:-1]))/np.sum(conf[:-1,:])*100
             print"\t\t - Conf Mat : "
             print conf
@@ -353,10 +416,12 @@ def allCrossResultAnalysis(tfn, model ):
                             
             confAllWordsAllPost = 0
             confUnknWordsAllPost = 0
-            confAmbWordsAllPost = 0
-            
+            confKnownWordsAllPost = 0
+            confAmbWordsAllPost = 0            
+               
             confAllWordsMostPost = 0
-            confUnknWordsMostPost = 0
+            confUnknownWordsMostPost = 0
+            confKnownWordsMostPost = 0
             confAmbWordsMostPost = 0
         
             print("\n\n\n\n\n*********************************************************")
@@ -394,35 +459,40 @@ def allCrossResultAnalysis(tfn, model ):
                 print pos
                 
                 confAllWordsAllPost += confMatAllWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, pos)
-                
-                
+                                
                 confUnknWordsAllPost += confMatUnknownWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, pos)
                 
+                confKnownWordsAllPost += confMatKnownWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, pos)
+                
                 confAmbWordsAllPost += confMatAmbiguousWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, ambiguousWords, pos)
-               
                
                 #mostPos, freq = buildNMostPos(posOr[:-1], posFreq, mostAppear)
                 mostPos = pos[:mostAppear]
                 mostPos.append(unknownPOS)
                 
                 confAllWordsMostPost += confMatAllWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, mostPos)
+                                
+                confUnknownWordsMostPost += confMatUnknownWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, mostPos)
                 
-                
-                confUnknWordsMostPost += confMatUnknownWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, mostPos)
+                confKnownWordsMostPost += confMatKnownWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, mostPos)
                 
                 confAmbWordsMostPost += confMatAmbiguousWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, ambiguousWords, mostPos)
                 
-            confAllWordsAllPost = confAllWordsAllPost# / maxCross
-            confUnknWordsAllPost = confUnknWordsAllPost# / maxCross
-            confAmbWordsAllPost = confAmbWordsAllPost# / maxCross
+#            confAllWordsAllPost = confAllWordsAllPost / maxCross
+#            confUnknWordsAllPost = confUnknWordsAllPost / maxCross
+#            confKnownWordsAllPost = confKnownWordsAllPost / maxCross
+#            confAmbWordsAllPost = confAmbWordsAllPost / maxCross
             
-            confAllWordsMostPost = confAllWordsMostPost# / maxCross
-            confUnknWordsMostPost = confUnknWordsMostPost# / maxCross
-            confAmbWordsMostPost = confAmbWordsMostPost# / maxCross
+#            confAllWordsMostPost = confAllWordsMostPost / maxCross
+#            confUnknownWordsMostPost = confUnknownWordsMostPost / maxCross
+#            confAmbWordsMostPost = confAmbWordsMostPost / maxCross
             
             print "\n\n : Result : "     
             print "---> All Words : "
             print"\t\t - Percentage = ", float(np.trace(confAllWordsAllPost[:-1,:-1]))/np.sum(confAllWordsAllPost[:-1,:])*100
+            
+            print "\n---> Known Words : "
+            print"\n\t\t - Percentage = ", float(np.trace(confKnownWordsAllPost[:-1,:-1]))/np.sum(confKnownWordsAllPost[:-1,:])*100
             
             print "\n---> Unknown Words : "
             print"\n\t\t - Percentage = ", float(np.trace(confUnknWordsAllPost[:-1,:-1]))/np.sum(confUnknWordsAllPost[:-1,:])*100
@@ -440,10 +510,15 @@ def allCrossResultAnalysis(tfn, model ):
             print"\t\t - Conf Mat : "
             print confAllWordsMostPost
             
-            print "---> Unknown Words For Most POS : "
-            print"\t\t - Percentage = ", float(np.trace(confUnknWordsMostPost[:-1,:-1]))/np.sum(confUnknWordsMostPost[:-1,:])*100
+            print "---> Known Words For Most POS : "
+            print"\t\t - Percentage = ", float(np.trace(confKnownWordsMostPost[:-1,:-1]))/np.sum(confKnownWordsMostPost[:-1,:])*100
             print"\t\t - Conf Mat : "
-            print confUnknWordsMostPost
+            print confKnownWordsMostPost
+            
+            print "---> Unknown Words For Most POS : "
+            print"\t\t - Percentage = ", float(np.trace(confUnknownWordsMostPost[:-1,:-1]))/np.sum(confUnknownWordsMostPost[:-1,:])*100
+            print"\t\t - Conf Mat : "
+            print confUnknownWordsMostPost
             
             print "---> Ambiguous Words For Most POS : "                
             print"\t\t - Percentage = ", float(np.trace(confAmbWordsMostPost[:-1,:-1]))/np.sum(confAmbWordsMostPost[:-1,:])*100
@@ -492,9 +567,10 @@ def oneCrossResultAnalysis(tfn, model, cnum ):
             print pos
             
             confAllWordsAllPost = confMatAllWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, pos)
+                        
+            confUnknownWordsAllPost = confMatUnknownWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, pos)
             
-            
-            confUnknWordsAllPost = confMatUnknownWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, pos)
+            confKnownWordsAllPost = confMatKnownWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, pos)
             
             confAmbWordsAllPost = confMatAmbiguousWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, ambiguousWords, pos)
            
@@ -504,9 +580,10 @@ def oneCrossResultAnalysis(tfn, model, cnum ):
             mostPos.append(unknownPOS)
             
             confAllWordsMostPost = confMatAllWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, mostPos)
+                        
+            confUnknownWordsMostPost = confMatUnknownWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, mostPos)
             
-            
-            confUnknWordsMostPost = confMatUnknownWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, mostPos)
+            confKnownWordsMostPost = confMatKnownWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, mostPos)
             
             confAmbWordsMostPost = confMatAmbiguousWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, ambiguousWords, mostPos)
             
@@ -514,8 +591,11 @@ def oneCrossResultAnalysis(tfn, model, cnum ):
             print "---> All Words : "
             print"\t\t - Percentage = ", float(np.trace(confAllWordsAllPost[:-1,:-1]))/np.sum(confAllWordsAllPost[:-1,:])*100
             
+            print "\n---> Known Words : "
+            print"\n\t\t - Percentage = ", float(np.trace(confKnownWordsAllPost[:-1,:-1]))/np.sum(confKnownWordsAllPost[:-1,:])*100
+            
             print "\n---> Unknown Words : "
-            print"\n\t\t - Percentage = ", float(np.trace(confUnknWordsAllPost[:-1,:-1]))/np.sum(confUnknWordsAllPost[:-1,:])*100
+            print"\n\t\t - Percentage = ", float(np.trace(confUnknownWordsAllPost[:-1,:-1]))/np.sum(confUnknownWordsAllPost[:-1,:])*100
             
             print "\n---> Ambiguous Words : "                 
             print"\t\t - Percentage = ", float(np.trace(confAmbWordsAllPost[:-1,:-1]))/np.sum(confAmbWordsAllPost[:-1,:])*100
@@ -530,10 +610,15 @@ def oneCrossResultAnalysis(tfn, model, cnum ):
             print"\t\t - Conf Mat : "
             print confAllWordsMostPost
             
-            print "---> Unknown Words For Most POS : "
-            print"\t\t - Percentage = ", float(np.trace(confUnknWordsMostPost[:-1,:-1]))/np.sum(confUnknWordsMostPost[:-1,:])*100
+            print "---> Known Words For Most POS : "
+            print"\t\t - Percentage = ", float(np.trace(confKnownWordsMostPost[:-1,:-1]))/np.sum(confKnownWordsMostPost[:-1,:])*100
             print"\t\t - Conf Mat : "
-            print confUnknWordsMostPost
+            print confKnownWordsMostPost
+            
+            print "---> Unknown Words For Most POS : "
+            print"\t\t - Percentage = ", float(np.trace(confUnknownWordsMostPost[:-1,:-1]))/np.sum(confUnknownWordsMostPost[:-1,:])*100
+            print"\t\t - Conf Mat : "
+            print confUnknownWordsMostPost
             
             print "---> Ambiguous Words For Most POS : "                
             print"\t\t - Percentage = ", float(np.trace(confAmbWordsMostPost[:-1,:-1]))/np.sum(confAmbWordsMostPost[:-1,:])*100
@@ -556,15 +641,15 @@ if __name__ == '__main__':
     models = []
     models.append('BLM')
     models.append('HMM')
-    #models.append('ENN')
+    models.append('ENN')
     
     print("\nRESULT ANALYSIS ... For Models {0}\n".format(models))
 
     tfn = templateFileName.TemplateFileName(base, bench)
     
-    #randResultAnalysis(tfn, models)
+    randResultAnalysis(tfn, models)
     
-    allCrossResultAnalysis(tfn, models)
+    #allCrossResultAnalysis(tfn, models)
     
     #oneCrossResultAnalysis(tfn, models, cnum)            
 
