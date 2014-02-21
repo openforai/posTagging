@@ -11,16 +11,16 @@ import numpy as np
 
 def viterbiProcessing(hmm, oseq):
     
-    delta = np.zeros( (oseq.shape[0], hmm.stateSize) )
-    psy = np.zeros( (oseq.shape[0], hmm.stateSize) )
+    delta = np.zeros( (oseq.shape[0], hmm.stateSize, hmm.stateSize) )
+    psy = np.zeros( (oseq.shape[0], hmm.stateSize, hmm.stateSize) )
         
-    stateSequence = np.zeros( oseq.shape[0], dtype=int)
+    stateSequence = np.zeros( oseq.shape[0], dtype='int')
         
     oseqInd = range( len(oseq) )
     stateInd = range( hmm.stateSize )
     T = len(oseq)-1
     
-    def _argMax(t, j):
+    def _argMax(t, j, k):
         '''
         Compute arg max 
         Return a tuple (maxValue, argument)
@@ -31,7 +31,7 @@ def viterbiProcessing(hmm, oseq):
         
         for i in stateInd:
             
-            tmp = delta[t,i] * hmm.getAij(i, j)
+            tmp = delta[t,i,j] * hmm.getAijk(i, j, k)
             
             if tmp > maxValue:
                 maxValue = tmp
@@ -49,19 +49,21 @@ def viterbiProcessing(hmm, oseq):
             o_t = oseq[t]
             
             for j in stateInd:
-                
-                psy[t, j], delta[t, j] = _argMax(t-1, j)
-                
-                delta[t, j] = delta[t, j] * hmm.getBik(j, o_t)
+                for k in stateInd:
+                    
+                    psy[t, j, k], delta[t, j, k] = _argMax(t-1, j, k)
+                    
+                    delta[t, j, k] = delta[t, j, k] * hmm.getBijk(j, k, o_t)
     
    
 
 #   Initialization
      
     for i in stateInd:
+        for j in stateInd:
         
-        delta[0, i] = hmm.getPii(i) * hmm.getBik(i, oseq[0]) # pi(i) * b_i0
-        psy[0, i] = 0
+            delta[0, i, j] = hmm.getPii(i) * hmm.getBijk(i, j, oseq[0]) # pi(i) * b_ij0
+            psy[0, i, j] = 0
 
 #    Recursion
     
@@ -70,18 +72,22 @@ def viterbiProcessing(hmm, oseq):
 # Termination
     
     maxValue = 0.0
-    arg = -1   
+    argi = -1
+    argj = -1
         
     for i in stateInd:
+        for j in stateInd:
             
-        if delta[T, i] > maxValue :
-            maxValue = delta[T, i]
-            arg = i
+            if delta[T, i, j] > maxValue :
+                maxValue = delta[T, i, j]
+                argj = j
+                argi = i
             
-    stateSequence[T] = arg
+    stateSequence[T] = argj
+    stateSequence[T-1] = argi
     probability = maxValue
 
-    for t in sorted(oseqInd[:len(oseqInd)-1], reverse=True) :
-        stateSequence[t] =  psy[t+1, stateSequence[t+1] ]
+    for t in sorted(oseqInd[:len(oseqInd)-2], reverse=True) :
+        stateSequence[t] =  psy[t+1, stateSequence[t+1], stateSequence[t+2] ]
    
     return (stateSequence, probability) 

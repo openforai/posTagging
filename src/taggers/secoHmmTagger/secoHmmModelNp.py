@@ -8,9 +8,8 @@ Created on Oct 9, 2013
 @contact:  <adiks007@gmail.com>
 '''
 
-from hmmImpl.hmm import HMM
-from hmmImpl.baumWelch import BaumWelch
-from hmmImpl.viterbi import viterbiProcessing
+from secoHmmImpl.secoHmm import SecoHMM
+from secoHmmImpl.viterbi import viterbiProcessing
 
 import dataProcessing.ioOperation as iop
 
@@ -36,7 +35,7 @@ class HmmModel(object):
         self.nbPos = len(posSet)
         self.nbObs = len(obsSet)
         
-        self.hmm = HMM(self.nbPos, self.nbObs + 1) # For Unknown Words
+        self.hmm = SecoHMM(self.nbPos, self.nbObs + 1) # For Unknown Words
         
         self.posFreq = np.zeros(self.nbPos)
         self.initFreq  = np.zeros(self.nbPos)
@@ -136,6 +135,7 @@ class HmmModel(object):
             i += 1
         
         return ( (oseq, newT) ) 
+     
                 
     def computeTags(self, phrase):
         

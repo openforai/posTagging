@@ -8,8 +8,8 @@ Created on Nov 2, 2013
 '''
 
 from secoHmm import SecoHMM
-from forwardBackward import ForwardBackward
-from baumWelch import BaumWelch
+#from forwardBackward import ForwardBackward
+#from baumWelch import BaumWelch
 
 import viterbi
 
@@ -46,7 +46,7 @@ secoHmm.display()
 
 bestPath = viterbi.viterbiProcessing(secoHmm, oseq)
 print("Best Path : {0}, p = {1}".format(bestPath[0], bestPath[1]))
-  
+exit()  
 fwbw = ForwardBackward(secoHmm, oseq, False, True)
 print("Probabilty of {0} is {1}".format(oseq, fwbw.probability) )
   
@@ -65,7 +65,7 @@ for i in range(1,11):
     print("Best Path : {0}, p = {1}".format(bestPath[0], bestPath[1]))
       
     fwbw = ForwardBackward(newHmm, oseq, False, True)
-    print("Probabilty of {0} is {1}".format(oseq, fwbw.probability) )
+    print("Probability of {0} is {1}".format(oseq, fwbw.probability) )
       
     if( bestPath[1] > oldP ) :
         oldHmm = newHmm

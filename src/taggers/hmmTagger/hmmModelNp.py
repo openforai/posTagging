@@ -9,7 +9,6 @@ Created on Oct 9, 2013
 '''
 
 from hmmImpl.hmm import HMM
-from hmmImpl.baumWelch import BaumWelch
 from hmmImpl.viterbi import viterbiProcessing
 
 import dataProcessing.ioOperation as iop
