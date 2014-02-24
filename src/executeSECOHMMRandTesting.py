@@ -22,7 +22,7 @@ if __name__ == '__main__':
     
     base = sys.argv[1]
     bench = sys.argv[2]
-    trainModel = False
+    trainModel = True
     
     
     print("\nSecond Order HMM Tagger testing ...\n")
@@ -43,17 +43,22 @@ if __name__ == '__main__':
         nbWords = meta[3]  
         #nbPos = meta[4]
         
-        print words
-        print pos
+        #print words
+        #print pos
        
         secoHmmTagger = secoHmmModelNp.HmmModel(words, pos)
         
         secoHmmTagger.computeInitialProb(tfn.benchRandTrainInd, maxLenPh, nbPhrase, nbWords)
         
         # Saved model
-        with open(tfn.secHmmModelRandTagging, 'wb') as hmmf:
-            hmmfPickle = pickle.Pickler(hmmf)
-            hmmfPickle.dump(secoHmmTagger)
+        
+        try:
+                
+            with open(tfn.secHmmModelRandTagging, 'wb') as hmmf:
+                hmmfPickle = pickle.Pickler(hmmf)
+                hmmfPickle.dump(secoHmmTagger)
+        except MemoryError:
+            print " Error When tried to saved model"
             
     else:
         
