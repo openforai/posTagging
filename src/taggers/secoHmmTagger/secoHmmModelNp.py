@@ -35,12 +35,12 @@ class HmmModel(object):
         self.nbPos = len(posSet)
         self.nbObs = len(obsSet)
         
-        self.hmm = SecoHMM(self.nbPos, self.nbObs + 1) # For Unknown Words
+        self.hmm = SecoHMM(self.nbPos+1, self.nbObs + 1) # For Unknown Words
         
-        self.posFreq = np.zeros(self.nbPos)
-        self.initFreq  = np.zeros(self.nbPos)
-        self.transitFreq = np.zeros( (self.nbPos, self.nbPos) )
-        self.distFreq = np.zeros( (self.nbPos, self.nbObs) )    
+        #self.posFreq = np.zeros(self.nbPos)
+        #self.initFreq  = np.zeros(self.nbPos)
+        #self.transitFreq = np.zeros( (self.nbPos, self.nbPos) )
+        #self.distFreq = np.zeros( (self.nbPos, self.nbObs) )    
       
       
     def computeInitialProb(self, phrasesInd, length, nbPhrase, nbTobs):
@@ -49,6 +49,16 @@ class HmmModel(object):
         '''
         
         print "\nComputing different frequences ...\n"
+        uniTrans = np.zeros(self.nbPos+1)
+        biTrans = np.zeros((self.nbPos+1, self.nbPos+1))
+        triTrans = np.zeros((self.nbPos+1, self.nbPos+1, self.nbPos+1))
+        
+        uniDist = np.zeros((self.nbPos+1, self.nbObs))
+        biDist = np.zeros((self.nbPos+1, self.nbPos+1, self.nbObs))
+        
+        posFreq = np.zeros(self.nbPos+1)
+        initFreq  = np.zeros(self.nbPos+1)
+        
         nbph = 0
         with open(phrasesInd, 'r') as f:
         
@@ -64,38 +74,96 @@ class HmmModel(object):
                 nbph += 1
                 
                 i = 0
-                self.initFreq[ array[i+length] ] += 1 # initial apparition
-                self.posFreq[ array[i+length] ] += 1
-                self.distFreq[ array[i+length], array[i] ]  += 1
+                initFreq[ array[i+length]+1 ] += 1 # initial apparition
+                #posFreq[ array[i+length]+1 ] += 1
+                uniDist[ array[i+length]+1, array[i] ]  += 1
+                biDist[ 0, array[i+length]+1, array[i] ]  += 1
+                
+                uniTrans[ array[i+length]+1 ]  += 1
+                biTrans[ 0, array[i+length]+1 ]  += 1
                 
                 for i in range(1, length):                    
                     
                     if( array[i] > -1 ):
                         
-                        self.posFreq[ array[i+length] ] += 1
+                        #posFreq[ array[i+length]+1 ] += 1
                         
-                        self.transitFreq[ array[i+length-1], array[i+length] ] += 1
-                        self.distFreq[ array[i+length], array[i] ]  += 1
-
+                        uniDist[ array[i+length]+1, array[i] ]  += 1
+                        biDist[ array[i+length-1]+1, array[i+length]+1, array[i] ]  += 1
+                        
+                        uniTrans[ array[i+length]+1 ]  += 1
+                        biTrans[ array[i+length-1]+1, array[i+length]+1 ]  += 1
+                        
+                        if i > 1 :
+                            triTrans[ array[i+length-2]+1, array[i+length-1]+1, array[i+length]+1 ]  += 1
+                        else:
+                            triTrans[ 0, array[i+length-1]+1, array[i+length]+1 ]  += 1
+                            
+                nbPosAppear = int(np.sum(uniTrans))
+                
+            #print nbPosAppear
+            
+            #print initFreq
+            #print posFreq
+            #print uniDist
+            #print biDist
+            
+            #print uniTrans
+            #print biTrans
+            #print triTrans
+                        
         if( nbph != nbPhrase):
             print "FATAL ERROR : DATA CORRUPTED, THE NUMBER OF PHRASES DID NOT MATCH"
             exit()
             
+        
+        C0 = nbPosAppear
+        print " \n Computing probabilities ... \n"
+                        
+        for i in range(self.nbPos+1): 
             
-        for i in range(self.nbPos): 
+            self.hmm.setPii( i, initFreq[i]/nbPhrase )
             
-            self.hmm.setPii( i, self.initFreq[i]/nbPhrase )
-            
-            for j in range(self.nbPos):
-                self.hmm.setAij( i, j, self.transitFreq[i,j]/self.posFreq[i] )
-                       
-            for k in range(self.nbObs):
-                self.hmm.setBik( i, k, self.distFreq[i, k]/self.posFreq[i] )
-            
-            k = self.nbObs
-            
-            self.hmm.setBik( i, k, np.sum(self.distFreq[i])/nbTobs ) # For Unknown words
+            for j in range(1, self.nbPos+1):
                 
+                C1 = uniTrans[j]
+                C2 = biTrans[i,j]
+                
+                if(C2 == 0): # If C2 = 0, N3 will also be 0 since ij is not there, then ijk will not be there
+                    C2 = 1 
+                    
+                for k in range(1, self.nbPos+1):
+                    
+                    N1 = uniTrans[k]
+                    N2 = biTrans[j,k]
+                    N3 = triTrans[i,j,k]                    
+                    
+                    k2 = ( np.log10(N2 + 1) + 1) / ( (np.log10(N2+1)) + 2 )
+                    k3 = ( np.log10(N3 + 1) + 1) / ( (np.log10(N3+1)) + 2 )
+                    
+                    p = k3*N3/C2 + (1-k3)*k2*N2/C1 + (1-k3)*(1-k2)*N1/C0
+                
+                    self.hmm.setAijk( i, j, k, p )
+                       
+                for k in range(self.nbObs):
+                    
+                    N2 = uniDist[j,k]
+                    N3 = biDist[i,j,k]
+                    
+                    k2 = 1.0 / ( (np.log10(N3+1)) + 2 )
+                    k3 = ( np.log10(N3 + 1) + 1) / ( (np.log10(N3+1)) + 2 )
+                    
+                    p = k3*N3/C2 + k2*N2/C1
+                    
+                    self.hmm.setBijk( i, j, k, p )
+                
+                k = self.nbObs
+            
+            self.hmm.setBijk( i, j, k, np.sum(biDist[i,j])/nbTobs ) # For Unknown words
+        
+        print " \n Normalize probabilities ... \n"
+        self.hmm.normalize()    
+        #self.hmm.display()    
         
     def buildObsFromPhrase(self, phrase):
         

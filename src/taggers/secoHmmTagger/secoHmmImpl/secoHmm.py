@@ -75,6 +75,22 @@ class SecoHMM(object):
         print(self.a)
         print("Distribution Probabilities")
         print(self.b)
+        
+    def normalize(self):
+        
+        for i in range (self._stateSize):
+            for j in range (self._stateSize):
+                
+                sumP = np.sum(self.a[i,j])
+                
+                if( sumP > 0) :
+                    self.a[i,j] = self.a[i,j] / sumP
+                    
+                sumP =  np.sum(self.b[i,j])
+                
+                if( sumP > 0) :
+                    self.b[i,j] = self.b[i,j] / sumP
+                
     
     obsSize = property(_getObsSize, _setObsSize)
     stateSize = property(_getStateSize, _setStateSize)

@@ -22,54 +22,56 @@ nbState = 3
 nbObs = 2
 obs = ["H", "T"]
 
-opdf = " 0.5 0.5\n 0.75 0.25\n 0.25 0.75"
+opdf = "0.5 0.5\n 0.5 0.5\n 0.75 0.25\n 0.25 0.75"
 bijk = np.genfromtxt(StringIO(opdf), delimiter=' ')
 oseq = np.array([0, 0, 0, 0, 1, 0, 1, 1, 1, 1])
 
 
-secoHmm = SecoHMM(nbState, nbObs)
+secoHmm = SecoHMM(nbState+1, nbObs)
 
-for i in range( nbState ):
+for i in range( nbState+1 ):
     
     secoHmm.setPii(i, pi)
     
-    for j in range( nbState ):
+    for j in range( nbState + 1 ):
         for k in range( nbObs ):
             secoHmm.setBijk( i, j, k, bijk[i,k] )
 
-for i in range( nbState ):
-    for j in range( nbState ):
-        for k in range( nbState ):
+for i in range( nbState + 1 ):
+    for j in range( nbState + 1):
+        for k in range( nbState + 1 ):
             secoHmm.setAijk(i, j, k, aijk)
+
+secoHmm.setPii(0, 0.0)
      
 secoHmm.display()
 
 bestPath = viterbi.viterbiProcessing(secoHmm, oseq)
 print("Best Path : {0}, p = {1}".format(bestPath[0], bestPath[1]))
 exit()  
-fwbw = ForwardBackward(secoHmm, oseq, False, True)
-print("Probabilty of {0} is {1}".format(oseq, fwbw.probability) )
-  
-print("Baum Welch processing ...")
-  
-oldHmm = secoHmm
-oldP = bestPath[1]
-for i in range(1,11):
-    print("\n\n Iteration {0} : \n".format(i))
-    baum = BaumWelch()
-    newHmm = baum.learn(oldHmm, oseq)
-      
-    newHmm.display()
-      
-    bestPath = viterbi.viterbiProcessing(newHmm, oseq)
-    print("Best Path : {0}, p = {1}".format(bestPath[0], bestPath[1]))
-      
-    fwbw = ForwardBackward(newHmm, oseq, False, True)
-    print("Probability of {0} is {1}".format(oseq, fwbw.probability) )
-      
-    if( bestPath[1] > oldP ) :
-        oldHmm = newHmm
-        oldP = bestPath[1]
-    else:
-        print("Best Model founded at iteration {0}.".format(i))
-        break
+# fwbw = ForwardBackward(secoHmm, oseq, False, True)
+# print("Probabilty of {0} is {1}".format(oseq, fwbw.probability) )
+#   
+# print("Baum Welch processing ...")
+#   
+# oldHmm = secoHmm
+# oldP = bestPath[1]
+# for i in range(1,11):
+#     print("\n\n Iteration {0} : \n".format(i))
+#     baum = BaumWelch()
+#     newHmm = baum.learn(oldHmm, oseq)
+#       
+#     newHmm.display()
+#       
+#     bestPath = viterbi.viterbiProcessing(newHmm, oseq)
+#     print("Best Path : {0}, p = {1}".format(bestPath[0], bestPath[1]))
+#       
+#     fwbw = ForwardBackward(newHmm, oseq, False, True)
+#     print("Probability of {0} is {1}".format(oseq, fwbw.probability) )
+#       
+#     if( bestPath[1] > oldP ) :
+#         oldHmm = newHmm
+#         oldP = bestPath[1]
+#     else:
+#         print("Best Model founded at iteration {0}.".format(i))
+#         break
