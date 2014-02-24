@@ -639,9 +639,10 @@ if __name__ == '__main__':
     cnum = int(sys.argv[3])
     mostAppear = int(sys.argv[4])
     models = []
-    models.append('BLM')
-    models.append('HMM')
-    models.append('ENN')
+    #models.append('BLM')
+    #models.append('HMM')
+    models.append('SECHMM')
+    #models.append('ENN')
     
     print("\nRESULT ANALYSIS ... For Models {0}\n".format(models))
 

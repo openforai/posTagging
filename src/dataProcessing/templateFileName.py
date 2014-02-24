@@ -93,6 +93,14 @@ class TemplateFileName(object):
             self.benchCrossResultTagging =  self.benchTestBase + 'resultCrossTagging_{0}.txt'.format(crossNum)
             self.hmmModelRandTagging =  self.benchTestBase + 'models/hmmModelRandTagging.pickle'
             self.hmmModelCrossTagging =  self.benchTestBase + 'models/hmmModelCrossTagging_{0}.pickle'.format(crossNum)
+            
+        elif ( model.lower() == 'sechmm'):
+            
+            self.benchTestBase = self.baseBench + 'testResult/secoHmm/'
+            self.benchRandResultTagging =  self.benchTestBase + 'resultRandTagging.txt'
+            self.benchCrossResultTagging =  self.benchTestBase + 'resultCrossTagging_{0}.txt'.format(crossNum)
+            self.secHmmModelRandTagging =  self.benchTestBase + 'models/secHmmModelRandTagging.pickle'
+            self.secHmmModelCrossTagging =  self.benchTestBase + 'models/secHmmModelCrossTagging_{0}.pickle'.format(crossNum)
         
         elif ( model.lower() == 'enn'):
             self.benchTestBase = self.baseBench + 'testResult/enn/'
