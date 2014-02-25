@@ -9,15 +9,15 @@ Created on Oct 5, 2013
 
 import numpy as np
 
-def viterbiProcessing(hmm, oseq):
+def viterbiProcessing(secoHmm, oseq):
     
-    delta = np.zeros( (oseq.shape[0], hmm.stateSize, hmm.stateSize) )
-    psy = np.zeros( (oseq.shape[0], hmm.stateSize, hmm.stateSize) )
+    delta = np.zeros( (oseq.shape[0], secoHmm.stateSize, secoHmm.stateSize) )
+    psy = np.zeros( (oseq.shape[0], secoHmm.stateSize, secoHmm.stateSize) )
         
     stateSequence = np.zeros( oseq.shape[0], dtype='int')
         
     oseqInd = range( len(oseq) )
-    stateInd = range( hmm.stateSize )
+    stateInd = range( secoHmm.stateSize )
     T = len(oseq)-1
     
     def _argMax(t, j, k, s_i):
@@ -31,7 +31,7 @@ def viterbiProcessing(hmm, oseq):
         
         for i in stateInd[s_i:]:
             
-            tmp = delta[t,i,j] * hmm.getAijk(i, j, k)
+            tmp = delta[t,i,j] * secoHmm.getAijk(i, j, k)
             
             if tmp > maxValue:
                 maxValue = tmp
@@ -54,20 +54,17 @@ def viterbiProcessing(hmm, oseq):
                     
                     psy[t, j, k], delta[t, j, k] = _argMax(t-1, j, k, s_i)
                     
-                    delta[t, j, k] = delta[t, j, k] * hmm.getBijk(j, k, o_t)
+                    delta[t, j, k] = delta[t, j, k] * secoHmm.getBijk(j, k, o_t)
             s_i = 1
              
 
 #   Initialization, delta has been initialized to zeros
      
     for i in stateInd:
-        #print hmm.getPii(i)
-        delta[0, 0, i] = hmm.getPii(i) * hmm.getBijk(0, i, oseq[0]) # pi(i) * b_ij0
+        #print secoHmm.getPii(i)
+        delta[0, 0, i] = secoHmm.getPii(i) * secoHmm.getBijk(0, i, oseq[0]) # pi(i) * b_ij0
         psy[0, 0, i] = 0
         
-    #print psy[0]
-    #print delta[0]
-
 #    Recursion
     
     _recursionStep()
@@ -88,21 +85,12 @@ def viterbiProcessing(hmm, oseq):
     
     stateSequence[T-1] = argi        
     stateSequence[T] = argj
-    
-    #print stateSequence
-    #print delta[T]
-    
+        
     probability = maxValue
 
-    for t in sorted(oseqInd[:len(oseqInd)-2], reverse=True) :
-        #print t
-        #print psy[t]
+    for t in sorted(oseqInd[:len(oseqInd)-2], reverse=True) :        
         stateSequence[t] =  psy[t+2, stateSequence[t+1], stateSequence[t+2] ]
-        #print stateSequence
-   
+        
     stateSequence -= 1
-    
-    if -1 in stateSequence:
-        print stateSequence
     
     return (stateSequence, probability) 

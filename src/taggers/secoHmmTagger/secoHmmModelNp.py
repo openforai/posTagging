@@ -19,7 +19,7 @@ from StringIO import StringIO
 import re
 
 
-class HmmModel(object):
+class SecoHmmModel(object):
     '''
     classdocs
     '''
@@ -35,14 +35,9 @@ class HmmModel(object):
         self.nbPos = len(posSet)
         self.nbObs = len(obsSet)
         
-        self.hmm = SecoHMM(self.nbPos+1, self.nbObs + 1) # For Unknown Words
+        self.secoHmm = SecoHMM(self.nbPos+1, self.nbObs + 1) # +1 For Unknown Words and dummy POS
         
-        #self.posFreq = np.zeros(self.nbPos)
-        #self.initFreq  = np.zeros(self.nbPos)
-        #self.transitFreq = np.zeros( (self.nbPos, self.nbPos) )
-        #self.distFreq = np.zeros( (self.nbPos, self.nbObs) )    
-      
-      
+        
     def computeInitialProb(self, phrasesInd, length, nbPhrase, nbTobs):
         '''
         Compute initial probability
@@ -81,6 +76,7 @@ class HmmModel(object):
                 
                 uniTrans[ array[i+length]+1 ]  += 1
                 biTrans[ 0, array[i+length]+1 ]  += 1
+                triTrans[ 0, 0, array[i+length]+1 ]  += 1
                 
                 for i in range(1, length):                    
                     
@@ -98,11 +94,7 @@ class HmmModel(object):
                             triTrans[ array[i+length-2]+1, array[i+length-1]+1, array[i+length]+1 ]  += 1
                         else:
                             triTrans[ 0, array[i+length-1]+1, array[i+length]+1 ]  += 1
-                            
-                nbPosAppear = int(np.sum(uniTrans))
-                
-            #print nbPosAppear
-            
+          
             #print initFreq
             #print posFreq
             #print uniDist
@@ -115,14 +107,16 @@ class HmmModel(object):
         if( nbph != nbPhrase):
             print "FATAL ERROR : DATA CORRUPTED, THE NUMBER OF PHRASES DID NOT MATCH"
             exit()
-            
         
-        C0 = nbPosAppear
         print " \n Computing probabilities ... \n"
+        
+        C0 = int(np.sum(uniTrans))
                         
         for i in range(self.nbPos+1): 
             
-            self.hmm.setPii( i, initFreq[i]/nbPhrase )
+            self.secoHmm.setPii( i, initFreq[i]/nbPhrase )
+            
+            #print "\n\n\n- pii(",i,") = \n", initFreq[i]/nbPhrase
             
             for j in range(1, self.nbPos+1):
                 
@@ -142,8 +136,10 @@ class HmmModel(object):
                     k3 = ( np.log10(N3 + 1) + 1) / ( (np.log10(N3+1)) + 2 )
                     
                     p = k3*N3/C2 + (1-k3)*k2*N2/C1 + (1-k3)*(1-k2)*N1/C0
+                    
+                    #print "\t- Aijk({0},{1},{2}) = {3}".format(i, j, k, p)
                 
-                    self.hmm.setAijk( i, j, k, p )
+                    self.secoHmm.setAijk( i, j, k, p )
                        
                 for k in range(self.nbObs):
                     
@@ -155,15 +151,27 @@ class HmmModel(object):
                     
                     p = k3*N3/C2 + k2*N2/C1
                     
-                    self.hmm.setBijk( i, j, k, p )
+                    #print "\t\t- Bijk({0},{1},{2}) = {3}".format(i, j, k, p)
+                    
+                    self.secoHmm.setBijk( i, j, k, p )
                 
-                k = self.nbObs
+                k = self.nbObs # For Unknown words
             
-            self.hmm.setBijk( i, j, k, np.sum(biDist[i,j])/nbTobs ) # For Unknown words
+                N2 = np.sum(uniDist[j]) / nbTobs
+                N3 = np.sum(biDist[i,j]) / nbTobs
+                    
+                k2 = 1.0 / ( (np.log10(N3+1)) + 2 )
+                k3 = ( np.log10(N3 + 1) + 1) / ( (np.log10(N3+1)) + 2 )
+                    
+                p = k3*N3/C2 + k2*N2/C1
+                
+                #print "\t\t- Bijk({0},{1},{2}) = {3}".format(i, j, k, p)
+                    
+                self.secoHmm.setBijk( i, j, k, p ) 
         
-        print " \n Normalize probabilities ... \n"
-        self.hmm.normalize()    
-        #self.hmm.display()    
+        print " \n Normalize probabilities ... \n\n"
+        self.secoHmm.normalize()    
+        #self.secoHmm.display()    
         
     def buildObsFromPhrase(self, phrase):
         
@@ -209,13 +217,13 @@ class HmmModel(object):
         
         oseq, tokens = self.buildObsFromPhrase(phrase)
        
-        bestPath = viterbiProcessing(self.hmm, oseq)
+        bestPath = viterbiProcessing(self.secoHmm, oseq)
         
         #print("Seq : {0}".format(oseq))
         #print("Best Path : {0}, p = {1}".format(bestPath[0], bestPath[1]))
     
         res = np.zeros( len(bestPath[0]), dtype = '|S60' )
-        
+        #print bestPath[0]
         for i in range(len(bestPath[0])) :
             res[i] = tokens[i] + '/' + self.posSet[ bestPath[0][i] ]
    
@@ -245,7 +253,7 @@ class HmmModel(object):
                 
                 phraseRes = ''
                 for tag in path :                        
-                        phraseRes = phraseRes + ' ' + tag    
+                    phraseRes = phraseRes + ' ' + tag    
                 
                 #print phraseRes    
                 rf.write(phraseRes)
