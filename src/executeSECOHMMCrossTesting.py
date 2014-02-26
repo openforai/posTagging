@@ -60,6 +60,9 @@ if __name__ == '__main__':
                 with open(tfn.secHmmModelCrossTagging, 'wb') as hmmf:
                     hmmfPickle = pickle.Pickler(hmmf)
                     hmmfPickle.dump(secoHmmTagger)
+                    
+                saved = True
+                
             except MemoryError:
                 saved = False
                 print " Error When tried to saved model"
@@ -70,6 +73,8 @@ if __name__ == '__main__':
             with open(tfn.secHmmModelCrossTagging, 'rb') as w:
                 wPickle = pickle.Unpickler(w)
                 secoHmmTagger = wPickle.load()
+                
+            saved = True
         
         endInit = time.time()
         
