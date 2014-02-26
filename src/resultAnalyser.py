@@ -367,6 +367,7 @@ def randResultAnalysis(tfn, model ):
             print "\n---> Unknown Words : "
             conf = confMatUnknownWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, pos)
             print"\n\t\t - Percentage = ", float(np.trace(conf[:-1,:-1]))/np.sum(conf[:-1,:])*100
+            print"\n\t\t - Nb Unknown Words = ", np.sum(conf[:-1,:])
             
             print "\n---> Ambiguous Words : "
             conf = confMatAmbiguousWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, ambiguousWords, pos)
@@ -426,7 +427,7 @@ def allCrossResultAnalysis(tfn, model ):
         
             print("\n\n\n\n\n*********************************************************")
             print("*                                                       *")
-            print("*    {0} Cross Testing Result Analysis                   *".format(model))
+            print("*    {0} All Cross Testing Result Analysis              *".format(model))
             print("*                                                       *")
             print("*********************************************************\n\n")
             
@@ -496,6 +497,7 @@ def allCrossResultAnalysis(tfn, model ):
             
             print "\n---> Unknown Words : "
             print"\n\t\t - Percentage = ", float(np.trace(confUnknWordsAllPost[:-1,:-1]))/np.sum(confUnknWordsAllPost[:-1,:])*100
+            print"\n\t\t - Nb Unknown Words = ", np.sum(confUnknWordsAllPost[:-1,:])
             
             print "\n---> Ambiguous Words : "                 
             print"\t\t - Percentage = ", float(np.trace(confAmbWordsAllPost[:-1,:-1]))/np.sum(confAmbWordsAllPost[:-1,:])*100
@@ -534,7 +536,7 @@ def oneCrossResultAnalysis(tfn, model, cnum ):
                    
             print("\n\n\n\n\n*********************************************************")
             print("*                                                       *")
-            print("*    {0} Cross Testing Result Analysis                   *".format(model))
+            print("*    {0} One Cross Testing Result Analysis              *".format(model))
             print("*                                                       *")
             print("*********************************************************\n\n")
             
@@ -593,9 +595,10 @@ def oneCrossResultAnalysis(tfn, model, cnum ):
             
             print "\n---> Known Words : "
             print"\n\t\t - Percentage = ", float(np.trace(confKnownWordsAllPost[:-1,:-1]))/np.sum(confKnownWordsAllPost[:-1,:])*100
-            
+                        
             print "\n---> Unknown Words : "
             print"\n\t\t - Percentage = ", float(np.trace(confUnknownWordsAllPost[:-1,:-1]))/np.sum(confUnknownWordsAllPost[:-1,:])*100
+            print"\n\t\t - Nb Unknown Words = ", np.sum(confUnknownWordsAllPost[:-1,:])
             
             print "\n---> Ambiguous Words : "                 
             print"\t\t - Percentage = ", float(np.trace(confAmbWordsAllPost[:-1,:-1]))/np.sum(confAmbWordsAllPost[:-1,:])*100
@@ -631,32 +634,49 @@ def oneCrossResultAnalysis(tfn, model, cnum ):
 
 if __name__ == '__main__':    
     
-    #print(sys.argv)
-    
+    print(sys.argv)
+   
     base = sys.argv[1]
     bench = sys.argv[2]
     maxCross = int(sys.argv[3])
     cnum = int(sys.argv[3])
     mostAppear = int(sys.argv[4])
     models = []
-    #models.append('BLM')
-    #models.append('HMM')
-    models.append('SECHMM')
-    #models.append('ENN')
+    modelThere = False
+    resThere = False
+    
+    if len(sys.argv) < 6 :
+        print " missing model parameter, append BLM or HMM or SECHMM or ENN or all at same time (UPPERCASE)"
+        exit()
+    
+    modelW = ['BLM', 'HMM', 'SECHMM', 'ENN']
+    
+    for m in modelW :
+        if m in sys.argv[5:]:
+            models.append(m)
+            modelThere = True
+    
+    if not modelThere :
+        print " missing model parameter, append BLM or HMM or SECHMM or ENN or all at same time (UPPERCASE)"
+        exit()
+        
+    if len(sys.argv) < 7 :
+        print " missing result parameter, append RAND or ALLCROSS or ONECROSS or all at same time (UPPERCASE)"
+        exit()
+    
+    resW = ['RAND', 'ALLCROSS', 'ONECROSS']
     
     print("\nRESULT ANALYSIS ... For Models {0}\n".format(models))
 
     tfn = templateFileName.TemplateFileName(base, bench)
     
-    randResultAnalysis(tfn, models)
+    if( resW[0] in sys.argv[6:] ):
+        randResultAnalysis(tfn, models)
     
-    #allCrossResultAnalysis(tfn, models)
+    elif( resW[1] in sys.argv[6:] ):
+        allCrossResultAnalysis(tfn, models)
     
-    #oneCrossResultAnalysis(tfn, models, cnum)            
+    elif( resW[2] in sys.argv[6:] ):
+        oneCrossResultAnalysis(tfn, models, cnum)            
 
-        #print "Cross Analysing"
-        #crossResAnalyser(tfn, model)
-        
-    
-    
     print "\n\n\n\n RESULT ANALYSIS ENDED."
