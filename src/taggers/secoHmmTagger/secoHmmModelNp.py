@@ -171,7 +171,16 @@ class SecoHmmModel(object):
         
         print " \n Normalize probabilities ... \n\n"
         self.secoHmm.normalize()    
-        #self.secoHmm.display()    
+        #self.secoHmm.display() 
+        
+        del initFreq
+        del posFreq
+        del uniDist
+        del biDist
+        
+        del uniTrans
+        del biTrans
+        del triTrans   
         
     def buildObsFromPhrase(self, phrase):
         
