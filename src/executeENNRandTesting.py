@@ -22,7 +22,7 @@ if __name__ == '__main__':
     
     base = sys.argv[1]
     bench = sys.argv[2]
-    trainModel = True
+    trainModel = False
     batchTraining = True
     
     

@@ -419,6 +419,7 @@ class ElasticNN(object):
         '''
         
         print "\nTesting ...\n"
+        print "New Tagging method"
         
         with open(res, 'w') as rf:
             
@@ -490,7 +491,10 @@ class ElasticNN(object):
                             #print tokens[i] + "/" + pos
                             #print posi, mostTag[posi]
                         else:                       
-                            phraseRes = phraseRes + " " + tokens[i] + "/" + "UnknownPOS"
+                            
+                            pos = self.posSet[ np.argmax(self.posfreq) ]
+                            
+                            phraseRes = phraseRes + " " + tokens[i] + "/" + pos
                         
                 phraseRes = phraseRes.strip()
                

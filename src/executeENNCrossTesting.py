@@ -24,7 +24,7 @@ if __name__ == '__main__':
     bench = sys.argv[2]
     #maxCross = int(sys.argv[3])
     crossNum = int(sys.argv[3])
-    trainModel = True
+    trainModel = False
     batchTraining = True
     
     
@@ -72,7 +72,7 @@ if __name__ == '__main__':
         
         print " Reading saved model at : ", tfn.ennModelCrossTagging
         
-        with open(tfn.hmmModelCrossTagging, 'rb') as w:
+        with open(tfn.ennModelCrossTagging, 'rb') as w:
             wPickle = pickle.Unpickler(w)
             ennTagger = wPickle.load()
     
