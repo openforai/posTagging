@@ -18,29 +18,33 @@ class BaumWelch(object):
     '''
 
 
-    def __init__(self):
+    def __init__(self, hmm):
         '''
         Constructor
         '''
+        
+        self.hmm = hmm
+        self.N = hmm.stateSize
+        self.stateInd = range( self.N )
     
-    def learn(self, hmm, oseq, nbIter=1):
+    def learn(self, oseq, nbIter=1):
         '''
         Build the new model that increase the probability of observing the sequence o
         '''
         
         T = len(oseq)
-        N = hmm.stateSize
+        #self.N = hmm.stateSize
         
         oseqInd = range( T )
-        stateInd = range( N )
+        #self.stateInd = range( self.N )
         #interInd = range( nbIter )
         
-        xi = np.zeros((T-1, N, N)) # 3-D arrays : (T-1) * N * N
-        gamma = np.zeros((T, N))
-        sumXi = np.zeros((N, N))
-        sumGamma = np.zeros(N)
+        xi = np.zeros((T-1, self.N, self.N)) # 3-D arrays : (T-1) * self.N * self.N
+        gamma = np.zeros((T, self.N))
+        sumXi = np.zeros((self.N, self.N))
+        sumGamma = np.zeros(self.N)
         
-        fwbw = ForwardBackward(hmm, oseq, True, True)
+        fwbw = ForwardBackward(self.hmm, oseq, True, True)
         
         def calculateXi() :
             '''
@@ -51,10 +55,10 @@ class BaumWelch(object):
         
             for t in oseqInd[:T-1] : # last transition start at T-1 to T.
                                     # we have T-1 possible transitions 
-                for i in stateInd :
+                for i in self.self.stateInd :
                 
-                    for j in stateInd : # x[t][i][j] probability of being in state i at time t and in state j at time t+1
-                        xi[t, i, j] = fwbw.getAlphati(t, i) *  hmm.getAij(i, j) * hmm.getBik(j, oseq[t]) * fwbw.getBetatj(t+1, j) / po
+                    for j in self.stateInd : # x[t][i][j] probability of being in state i at time t and in state j at time t+1
+                        xi[t, i, j] = fwbw.getAlphati(t, i) *  self.hmm.getAij(i, j) * self.hmm.getBik(j, oseq[t]) * fwbw.getBetatj(t+1, j) / po
          
          
         def calculateGamma() :
@@ -63,35 +67,35 @@ class BaumWelch(object):
             '''
         
             for t in oseqInd[:T-1] :                
-                for i in stateInd :
-                    for j in stateInd :
+                for i in self.stateInd :
+                    for j in self.stateInd :
                         gamma[t, i] += xi[t, i, j] # The nb transition from i at time t
             
             t += 1
             
-            for j in stateInd :    # t = T, probability that the last observable will be produce by State j
-                for i in stateInd :
+            for j in self.stateInd :    # t = T, probability that the last observable will be produce by State j
+                for i in self.stateInd :
                     gamma[t][j] = xi[t-1][i][j];
           
           
         calculateXi()
         calculateGamma()
         
-        for i in stateInd : # compute the number of transition from state i to state j        
-            for j in stateInd :
+        for i in self.stateInd : # compute the number of transition from state i to state j        
+            for j in self.stateInd :
                 for t in oseqInd[:T-1] :
                     sumXi[i, j] += xi[t, i, j];
                     
-        for i in stateInd : # compute the number of transition from state i               
+        for i in self.stateInd : # compute the number of transition from state i               
             for t in oseqInd[:T-1] :
                 sumGamma[i] += gamma[t, i];
         
-        newHmm = HMM(hmm.stateSize, hmm.obsSize)
+        newHmm = HMM(self.hmm.stateSize, self.hmm.obsSize)
         
-        for i in stateInd :
+        for i in self.stateInd :
             newHmm.setPii( i,  gamma[1, i] )
             
-            for j in stateInd :
+            for j in self.stateInd :
                 newHmm.setAij(i, j, sumXi[i, j] / sumGamma[i] );    # aij
             
             for k in range(newHmm.obsSize) : #compute bik

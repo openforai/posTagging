@@ -9,7 +9,7 @@ Created on Oct 9, 2013
 '''
 
 from hmmImpl.hmm import HMM
-from hmmImpl.viterbi import viterbiProcessing
+from hmmImpl.viterbi import Viterbi
 
 import dataProcessing.ioOperation as iop
 
@@ -41,7 +41,7 @@ class HmmModel(object):
         self.initFreq  = np.zeros(self.nbPos)
         self.transitFreq = np.zeros( (self.nbPos, self.nbPos) )
         self.distFreq = np.zeros( (self.nbPos, self.nbObs) )    
-      
+        
       
     def computeInitialProb(self, phrasesInd, length, nbPhrase, nbTobs):
         '''
@@ -140,7 +140,7 @@ class HmmModel(object):
         
         oseq, tokens = self.buildObsFromPhrase(phrase)
        
-        bestPath = viterbiProcessing(self.hmm, oseq)
+        bestPath = self.viterbi.computeBestPath(oseq)
         
         #print("Seq : {0}".format(oseq))
         #print("Best Path : {0}, p = {1}".format(bestPath[0], bestPath[1]))
@@ -162,6 +162,8 @@ class HmmModel(object):
         
         i = 0
         n = 1000
+        
+        self.viterbi = Viterbi(self.hmm)
         
         with open(res, 'w') as rf:
         
