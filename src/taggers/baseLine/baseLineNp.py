@@ -94,6 +94,7 @@ class BaseLineModel(object):
             cInd = np.argmax(self.posfreq)
             
         return cInd
+ 
         
     def tagging(self, testingFile, resultFile):
         '''

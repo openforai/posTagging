@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #-*-coding:Utf-8-*
 
-'''
+'''	
 Created on Oct 9, 2013
 
 @author: Paulin AMOUGOU
@@ -181,6 +181,7 @@ class SecoHmmModel(object):
         del uniTrans
         del biTrans
         del triTrans   
+        
         
     def buildObsFromPhrase(self, phrase):
         

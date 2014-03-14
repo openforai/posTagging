@@ -64,6 +64,9 @@ class EMLP:
     
     def updateLR(self, newl, newr):
         
+        self.l = newl
+        self.r = newr
+        
         self.nacthidden = ((newl + newr + 1) * self.nout) / 2
         
         self.uphidw.fill(0.0)
@@ -187,6 +190,7 @@ class EMLP:
         
         self.hidwSaved = self.hidw
         self.outwSaved = self.outw
+        
         
     def restoreOldWeight(self):
         

@@ -26,6 +26,7 @@ class BrownProcessing(object):
         
         self.benchBrown = benchBrown
         self.baseBrown = baseBrown
+
         
     def readOnePhrase(self, filePath):
         """ Read one line of phrase of brown corpus """

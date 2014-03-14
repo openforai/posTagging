@@ -23,9 +23,15 @@ if __name__ == '__main__':
     base = sys.argv[1]
     bench = sys.argv[2]
     maxCross = int(sys.argv[3])
-    trainModel = True
-        
+    trainModelArg = sys.argv[4]
+    
+    if( trainModelArg.upper() == 'TRUE' ):
+        trainModel = True
+    else:
+        trainModel = False
+    
     print("\nBase Line testing ...\n")
+    
 
     tfn = templateFileName.TemplateFileName(base, bench)
     
@@ -39,6 +45,9 @@ if __name__ == '__main__':
         start = time.time()
         
         if trainModel :
+            
+            print "\n\n Building new model ... \n"
+            
             words = iop.readWords(tfn.benchCrossWords)
             pos = iop.readPos(tfn.benchCrossCategories)
               

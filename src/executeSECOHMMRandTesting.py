@@ -22,7 +22,13 @@ if __name__ == '__main__':
     
     base = sys.argv[1]
     bench = sys.argv[2]
-    trainModel = True
+    trainModelArg = sys.argv[3]
+    
+    if( trainModelArg.upper() == 'TRUE' ):
+        trainModel = True
+    else:
+        trainModel = False
+        
     saved = False
     
     
@@ -35,6 +41,8 @@ if __name__ == '__main__':
     
     if( trainModel ): 
         
+        print "\n\n Building new model ... \n"
+         
         words = iop.readWords(tfn.benchRandWords)
         pos = iop.readPos(tfn.benchRandCategories)
           

@@ -186,6 +186,7 @@ def readPos(cf):
     
     return categories
 
+
 def readPosFreq(cf):
     
     print "\nReading POS Frequences ...\n"

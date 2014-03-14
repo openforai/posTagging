@@ -96,7 +96,6 @@ class CrossingData(object):
         print " Crossing Data Generation ended.\n"
 
 
-
     def buildCrossBench(self, tfn, maxCross, crossNum):
         
             
@@ -109,7 +108,6 @@ class CrossingData(object):
                     cross.write(tfn.benchCrossFiles.format(i))                    
                     cross.write('\n')
         
-
                     
     def buildCrossTrainAndMeta(self, tfn):
    
@@ -279,8 +277,7 @@ class CrossingData(object):
     
 # End brownTrainWithMainCats
 
-
-    
+   
     def buildCrossTestData(self, tfn, crossNum):
         
         print " Build Testing Data ... \n"

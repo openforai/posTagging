@@ -14,7 +14,7 @@ class TemplateFileName(object):
     def __init__(self, base, bench):
 
         if(bench.lower() == 'brown'):
-            self.baseBench = base + '/brown/'
+            self.baseBench = base + '/brown-dummy/'
             self.benchFiles = self.baseBench + 'brownBench.txt'
             
             self.mainBenchBase = self.baseBench + 'mainData/'            

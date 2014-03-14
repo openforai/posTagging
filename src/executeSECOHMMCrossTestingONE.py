@@ -24,7 +24,12 @@ if __name__ == '__main__':
     bench = sys.argv[2]
     maxCross = int(sys.argv[3])
     crossNum = int(sys.argv[3])
-    trainModel = True
+    trainModelArg = sys.argv[4]
+    
+    if( trainModelArg.upper() == 'TRUE' ):
+        trainModel = True
+    else:
+        trainModel = False
     saved = False
     
     print("\nSecond Order HMM Tagger testing ...\n")
@@ -41,6 +46,9 @@ if __name__ == '__main__':
     start = time.time()
     
     if( trainModel ): 
+        
+        print "\n\n Building new model ... \n"
+         
         words = iop.readWords(tfn.benchCrossWords)
         pos = iop.readPos(tfn.benchCrossCategories)
           

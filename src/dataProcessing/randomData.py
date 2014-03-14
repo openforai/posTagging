@@ -28,6 +28,7 @@ class RandomData(object):
         '''
         Constructor
         '''
+    
         
     def buildTrainAndTestData(self, tfn, percentage):
         '''
