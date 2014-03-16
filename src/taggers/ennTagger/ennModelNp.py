@@ -137,7 +137,8 @@ class ElasticNN(object):
                     #print tokens[klr] + " is Know"                                          
                     inputs[k, xi] = self.ew[phi, p]
                 else:           # For Unknown Words
-                    inputs[k, xi] = 1.0 / self.nbPos
+                    #inputs[k, xi] = 1.0 / self.nbPos
+                    inputs[k, xi] = self.posfreq[p] / np.sum(self.posfreq)
                     #print tokens[klr] + " is UNKNOW"
                     
                 xi += 1            
@@ -388,7 +389,7 @@ class ElasticNN(object):
                             
                             self.eMlp.fwdBackwdBatch(inputs, targets, eta)                    
                     
-                            self.eMlp.weightUpdate() # used if self.eMlp.fwdBackwd2 is used above
+                        self.eMlp.weightUpdate() # used if self.eMlp.fwdBackwd2 is used above
                             
                             # End Of Iteration
                             
