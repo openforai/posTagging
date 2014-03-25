@@ -181,7 +181,7 @@ class ElasticNN(object):
                 
             for i in range(self.nbWords):            
                 for j in range(self.nbPos):
-                    self.ew[i,j] = ( self.cwfreq[i,j] ) / ( self.wfreq[i] )
+                    self.ew[i,j] = self.cwfreq[i,j] / self.wfreq[i]
                     
         #print self.ew  
 
@@ -420,7 +420,7 @@ class ElasticNN(object):
         '''
         
         print "\nTesting ...\n"
-        print "New Tagging method : Model 1"
+        print "New Tagging method"
         
         with open(res, 'w') as rf:
             
@@ -507,4 +507,5 @@ class ElasticNN(object):
       
             print ("\n\t- {0} phrases tagged.\n".format(nbt))
             print "\nTesting End. Result saved in " + res
+        
         

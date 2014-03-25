@@ -154,7 +154,7 @@ class ElasticNN(object):
         '''
         
         print "\nComputing different frequences ...\n"
-        
+                
         with open(phrasesInd, 'r') as f:
             
             ind = range(length)
@@ -174,16 +174,18 @@ class ElasticNN(object):
                     if( array[i] > -1 ):
                         self.wfreq[ array[i] ] += 1
                         self.posfreq[ array[i+length] ] += 1
-                        self.cwfreq[ array[i], array[i+length] ] +=1                    
+                        self.cwfreq[ array[i], array[i+length] ] +=1  
+                        
                         
                 #print self.cwfreq
                 #print self.wfreq  
                 
             for i in range(self.nbWords):            
                 for j in range(self.nbPos):
-                    self.ew[i,j] = ( self.cwfreq[i,j] ) / ( self.wfreq[i] )
+                    self.ew[i,j] = self.cwfreq[i,j] / self.wfreq[i]
                     
-        #print self.ew  
+        #print self.ew        
+        
 
     def validate(self, validInd, maxLenPh, posL, posR):
        
@@ -420,7 +422,7 @@ class ElasticNN(object):
         '''
         
         print "\nTesting ...\n"
-        print "New Tagging method : Model 1"
+        print "New Tagging method test 2"
         
         with open(res, 'w') as rf:
             
@@ -507,4 +509,5 @@ class ElasticNN(object):
       
             print ("\n\t- {0} phrases tagged.\n".format(nbt))
             print "\nTesting End. Result saved in " + res
+        
         

@@ -103,7 +103,9 @@ class TemplateFileName(object):
             self.secHmmModelCrossTagging =  self.benchTestBase + 'models/secHmmModelCrossTagging_{0}.pickle'.format(crossNum)
         
         elif ( model.lower() == 'enn'):
+            
             self.benchTestBase = self.baseBench + 'testResult/enn/'
+           
             self.benchRandResultTagging =  self.benchTestBase + 'resultRandTagging.txt'
             self.benchCrossResultTagging =  self.benchTestBase + 'resultCrossTagging_{0}.txt'.format(crossNum)
             
@@ -112,6 +114,62 @@ class TemplateFileName(object):
                 self.ennModelCrossTagging =  self.benchTestBase + 'models/ennBatchModelCrossTagging_{0}.pickle'.format(crossNum)
             else:
                 self.ennModelRandTagging =  self.benchTestBase + 'models/ennSeqModelRandTagging.pickle'
+                self.ennModelCrossTagging =  self.benchTestBase + 'models/ennSeqModelCrossTagging_{0}.pickle'.format(crossNum)
+                
+        elif ( model.lower() == 'enn2'):
+            
+            self.benchTestBase = self.baseBench + 'testResult/enn2/'
+           
+            self.benchRandResultTagging =  self.benchTestBase + 'resultRandTagging.txt'
+            self.benchCrossResultTagging =  self.benchTestBase + 'resultCrossTagging_{0}.txt'.format(crossNum)
+            
+            if batch :
+                self.ennModelRandTagging =  self.benchTestBase + 'models/ennBatchModelRandTagging.pickle'
+                self.ennModelCrossTagging =  self.benchTestBase + 'models/ennBatchModelCrossTagging_{0}.pickle'.format(crossNum)
+            else:
+                self.ennModelRandTagging =  self.benchTestBase + 'models/ennSeqModelRandTagging.pickle'
+                self.ennModelCrossTagging =  self.benchTestBase + 'models/ennSeqModelCrossTagging_{0}.pickle'.format(crossNum)
+        
+        elif ( model.lower() == 'enn3'):
+            
+            self.benchTestBase = self.baseBench + 'testResult/enn3/'
+           
+            self.benchRandResultTagging =  self.benchTestBase + 'resultRandTagging.txt'
+            self.benchCrossResultTagging =  self.benchTestBase + 'resultCrossTagging_{0}.txt'.format(crossNum)
+            
+            if batch :
+                self.ennModelRandTagging =  self.benchTestBase + 'models/ennBatchModelRandTagging.pickle'
+                self.ennModelCrossTagging =  self.benchTestBase + 'models/ennBatchModelCrossTagging_{0}.pickle'.format(crossNum)
+            else:
+                self.ennModelRandTagging =  self.benchTestBase + 'models/ennSeqModelRandTagging.pickle'
+                self.ennModelCrossTagging =  self.benchTestBase + 'models/ennSeqModelCrossTagging_{0}.pickle'.format(crossNum)
+        
+        elif ( model.lower() == 'enn4'):
+            
+            self.benchTestBase = self.baseBench + 'testResult/enn4/'
+           
+            self.benchRandResultTagging =  self.benchTestBase + 'resultRandTagging.txt'
+            self.benchCrossResultTagging =  self.benchTestBase + 'resultCrossTagging_{0}.txt'.format(crossNum)
+            
+            if batch :
+                self.ennModelRandTagging =  self.benchTestBase + 'models/ennBatchModelRandTagging.pickle'
+                self.ennModelCrossTagging =  self.benchTestBase + 'models/ennBatchModelCrossTagging_{0}.pickle'.format(crossNum)
+            else:
+                self.ennModelRandTagging =  self.benchTestBase + 'models/ennSeqModelRandTagging.pickle'
+                self.ennModelCrossTagging =  self.benchTestBase + 'models/ennSeqModelCrossTagging_{0}.pickle'.format(crossNum)
+                
+        elif ( model.lower() == 'enn5'):
+            
+            self.benchTestBase = self.baseBench + 'testResult/enn5/'
+           
+            self.benchRandResultTagging =  self.benchTestBase + 'resultRandTagging_{0}_{1}.txt'
+            self.benchCrossResultTagging =  self.benchTestBase + 'resultCrossTagging_{0}.txt'.format(crossNum)
+            
+            if batch :
+                self.ennModelRandTagging =  self.benchTestBase + 'models/ennBatchModelRandTagging_{0}_{1}.pickle'
+                self.ennModelCrossTagging =  self.benchTestBase + 'models/ennBatchModelCrossTagging_{0}.pickle'.format(crossNum)
+            else:
+                self.ennModelRandTagging =  self.benchTestBase + 'models/ennSeqModelRandTagging_{0}_{1}.pickle'
                 self.ennModelCrossTagging =  self.benchTestBase + 'models/ennSeqModelCrossTagging_{0}.pickle'.format(crossNum)
         
         #print self.benchRandResultTagging

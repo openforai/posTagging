@@ -181,7 +181,7 @@ class ElasticNN(object):
                 
             for i in range(self.nbWords):            
                 for j in range(self.nbPos):
-                    self.ew[i,j] = ( self.cwfreq[i,j] ) / ( self.wfreq[i] )
+                    self.ew[i,j] = self.cwfreq[i,j] / self.wfreq[i]
                     
         #print self.ew  
 
@@ -389,7 +389,7 @@ class ElasticNN(object):
                             
                             self.eMlp.fwdBackwdBatch(inputs, targets, eta)                    
                     
-                            self.eMlp.weightUpdate() # used if self.eMlp.fwdBackwd2 is used above
+                        self.eMlp.weightUpdate() # used if self.eMlp.fwdBackwd2 is used above
                             
                             # End Of Iteration
                             
@@ -420,7 +420,7 @@ class ElasticNN(object):
         '''
         
         print "\nTesting ...\n"
-        print "New Tagging method : Model 1"
+        print "New Tagging method : model 2"
         
         with open(res, 'w') as rf:
             
@@ -443,15 +443,13 @@ class ElasticNN(object):
                 
                 for i in range(len(tokens)):
                     
-                    tagged = False
-                    
                     newL = self.l
                     newR = self.r
                     shiftL = False
                     
                     mostTag.fill(0)
                     
-                    while( (not tagged) and ((newL+newR)>0)):
+                    while( (newL+newR) > 0 ):
                
                         inputs= self.buildTestingInputFromPhrase(tokens, i, newL, newR)                
                     
@@ -459,44 +457,20 @@ class ElasticNN(object):
                         
                         tag = np.where(out >= 0.5)
                         mostTag[tag[1]] += 1
-                        
-                    
-                        #print tag
-                        
-                        if np.shape(tag[0])[0] == 1:
-                            pos = self.posSet[tag[1][0]]
-                       
-                            phraseRes = phraseRes + " " + tokens[i] + "/" + pos
-                            
-                            tagged = True
-                            
-                            #print tokens[i] + "/" + pos
-                            
+                                                    
                         if shiftL :
                             newL -= 1
                             shiftL = False
                         else :
                             newR -= 1
                             shiftL = True
-                            
-                    if not tagged : # UNKNOWN TAG
-                        
-                        #print mostTag
-                        
-                        posi = np.argmax( mostTag )
-                        
-                        if( ((posi == 0) and (mostTag[0] > 0)) or (posi != 0) ):
-                            pos = self.posSet[posi]
-                       
-                            phraseRes = phraseRes + " " + tokens[i] + "/" + pos
-                            #print tokens[i] + "/" + pos
-                            #print posi, mostTag[posi]
-                        else:                       
-                            
-                            pos = self.posSet[ np.argmax(self.posfreq) ]
-                            
-                            phraseRes = phraseRes + " " + tokens[i] + "/" + pos
-                        
+                    
+                    posi = np.argmax( mostTag )
+                    
+                    pos = self.posSet[posi]
+                   
+                    phraseRes = phraseRes + " " + tokens[i] + "/" + pos
+                                               
                 phraseRes = phraseRes.strip()
                
                 #print phraseRes    
@@ -507,4 +481,5 @@ class ElasticNN(object):
       
             print ("\n\t- {0} phrases tagged.\n".format(nbt))
             print "\nTesting End. Result saved in " + res
+        
         

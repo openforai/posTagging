@@ -324,7 +324,7 @@ def confMatAmbiguousWords(testRes, testTrue, words, ambiguousWords, pos):
     return conf
         
 
-def randResultAnalysis(tfn, model ):
+def randResultAnalysis(tfn, model, l, r ):
         
         for model in models:
         
@@ -338,7 +338,7 @@ def randResultAnalysis(tfn, model ):
             tfn.builfResultFile(model)
             posFreq = iop.readPosFreq(tfn.benchPosFreq)
             
-            print " FILE : " + tfn.benchRandResultTagging + "\n"
+            print " FILE : " + tfn.benchRandResultTagging.format(l, r) + "\n"
             
             words = iop.readWords(tfn.benchRandWords)
             posOr = iop.readPos(tfn.benchRandCategories)
@@ -358,22 +358,22 @@ def randResultAnalysis(tfn, model ):
             print "POS Frequence : ", freq
             
             print "---> All Words : "
-            conf = confMatAllWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, pos)
+            conf = confMatAllWords(tfn.benchRandResultTagging.format(l, r), tfn.benchRandTestParsed, words, pos)
             print"\t\t - Percentage = ", float(np.trace(conf[:-1,:-1]))/np.sum(conf[:-1,:])*100
             print"\t\t - Nb tested Words = ", np.sum(conf[:-1,:])
             
             print "\n---> Known Words : "
-            conf = confMatKnownWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, pos)
+            conf = confMatKnownWords(tfn.benchRandResultTagging.format(l, r), tfn.benchRandTestParsed, words, pos)
             print"\n\t\t - Percentage = ", float(np.trace(conf[:-1,:-1]))/np.sum(conf[:-1,:])*100
             print"\n\t\t - Nb Known Words = ", np.sum(conf[:-1,:])
             
             print "\n---> Unknown Words : "
-            conf = confMatUnknownWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, pos)
+            conf = confMatUnknownWords(tfn.benchRandResultTagging.format(l, r), tfn.benchRandTestParsed, words, pos)
             print"\n\t\t - Percentage = ", float(np.trace(conf[:-1,:-1]))/np.sum(conf[:-1,:])*100
             print"\n\t\t - Nb Unknown Words = ", np.sum(conf[:-1,:])
             
             print "\n---> Ambiguous Words : "
-            conf = confMatAmbiguousWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, ambiguousWords, pos)
+            conf = confMatAmbiguousWords(tfn.benchRandResultTagging.format(l, r), tfn.benchRandTestParsed, words, ambiguousWords, pos)
             
             print"\t\t - Percentage = ", float(np.trace(conf[:-1,:-1]))/np.sum(conf[:-1,:])*100
             print"\t\t - Nb Ambiguous Words = ",nbDistAmbWords
@@ -386,25 +386,25 @@ def randResultAnalysis(tfn, model ):
             print "\n\n---> Most Appeared POS : ", mostPos
                     
             print "\n\n---> All Words For Most POS : "
-            conf = confMatAllWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, mostPos)
+            conf = confMatAllWords(tfn.benchRandResultTagging.format(l, r), tfn.benchRandTestParsed, words, mostPos)
             print"\t\t - Percentage = ", float(np.trace(conf[:-1,:-1]))/np.sum(conf[:-1,:])*100
             print"\t\t - Conf Mat : "
             print conf
             
             print "---> Known Words For Most POS : "
-            conf = confMatKnownWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, mostPos)
+            conf = confMatKnownWords(tfn.benchRandResultTagging.format(l, r), tfn.benchRandTestParsed, words, mostPos)
             print"\t\t - Percentage = ", float(np.trace(conf[:-1,:-1]))/np.sum(conf[:-1,:])*100
             print"\t\t - Conf Mat : "
             print conf
             
             print "---> Unknown Words For Most POS : "
-            conf = confMatUnknownWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, mostPos)
+            conf = confMatUnknownWords(tfn.benchRandResultTagging.format(l, r), tfn.benchRandTestParsed, words, mostPos)
             print"\t\t - Percentage = ", float(np.trace(conf[:-1,:-1]))/np.sum(conf[:-1,:])*100
             print"\t\t - Conf Mat : "
             print conf
             
             print "---> Ambiguous Words For Most POS : "
-            conf = confMatAmbiguousWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, ambiguousWords, mostPos)
+            conf = confMatAmbiguousWords(tfn.benchRandResultTagging.format(l, r), tfn.benchRandTestParsed, words, ambiguousWords, mostPos)
             
             print"\t\t - Percentage = ", float(np.trace(conf[:-1,:-1]))/np.sum(conf[:-1,:])*100
             #print"\t\t - Nb Training Ambiguous Words = ",nbDistAmbWords - np.sum(conf)
@@ -658,7 +658,7 @@ if __name__ == '__main__':
         print " missing model parameter, append BLM or HMM or SECHMM or ENN or all at same time (UPPERCASE)"
         exit()
     
-    modelW = ['BLM', 'HMM', 'SECHMM', 'ENN', 'ENN2', 'ENN3', 'ENN4']
+    modelW = ['ENN5']
     
     for m in modelW :
         if m in sys.argv[5:]:
@@ -666,12 +666,19 @@ if __name__ == '__main__':
             modelThere = True
     
     if not modelThere :
-        print " missing model parameter, append BLM or HMM or SECHMM or ENN or all at same time (UPPERCASE)"
+        print " missing model parameter, append ENN5 (UPPERCASE)"
         exit()
         
     if len(sys.argv) < 7 :
-        print " missing result parameter, append RAND or ALLCROSS or ONECROSS or all at same time (UPPERCASE)"
+        print " missing result parameter, append RAND (UPPERCASE)"
         exit()
+        
+    if len(sys.argv) < 9 :
+        print " missing context parameters"
+        exit()
+    
+    l = int(sys.argv[7])
+    r = int(sys.argv[8])
     
     resW = ['RAND', 'ALLCROSS', 'ONECROSS']
     
@@ -680,12 +687,6 @@ if __name__ == '__main__':
     tfn = templateFileName.TemplateFileName(base, bench)
     
     if( resW[0] in sys.argv[6:] ):
-        randResultAnalysis(tfn, models)
+        randResultAnalysis(tfn, models, l, r)
     
-    elif( resW[1] in sys.argv[6:] ):
-        allCrossResultAnalysis(tfn, models)
-    
-    elif( resW[2] in sys.argv[6:] ):
-        oneCrossResultAnalysis(tfn, models, cnum)            
-
     print "\n\n\n\n RESULT ANALYSIS ENDED."
