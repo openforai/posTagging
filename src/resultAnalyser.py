@@ -156,6 +156,53 @@ def confMatAllWords(testRes, testTrue, words, pos):
     return conf
 
 
+def persCorrectPhrase(testRes, testTrue, words, pos):
+    
+    correctPhrase = 0
+    nbPhrase = 0
+    
+    for resTrue, resTested in iop.getNextTestedLine(testRes, testTrue):
+        
+        #print resTested
+        #print resTrue
+        #print "\n\n"
+        
+        trueWords = resTrue.strip().split(" ");
+        testedWords = resTested.strip().split(" ");
+        
+        if( len(trueWords) != len(testedWords)):
+            print " \n\n AN ERROR ENCOUNTERED WITH PHRASES LENGTH. SKIPPED : \n"
+            print resTested
+            print resTrue
+            print testRes
+            continue
+        
+        nbPhrase += 1
+        
+        if ( resTrue.strip() == resTested.strip() ):
+            correctPhrase += 1
+            
+            
+#         for c in range( len(trueWords) ):
+#             
+#             (tested, truth, state) = formatTag(testRes, testedWords[c], resTested, trueWords[c], resTrue, words, pos)
+#             #print tested, truth
+#             if( state ) :
+#                 
+#                 if ( tested[1] = truth[1] ) :
+#                     correct = True    
+#                     
+#                 persCorrectPhrase += 1
+#                 
+#                     
+#                 conf[i, j] += 1
+            
+    
+    #print conf
+    #print "Percentage Correct: ",np.trace(conf)/np.sum(conf)*100
+    return ( float(correctPhrase)/nbPhrase ) * 100 
+
+
 def confMatKnownWords(testRes, testTrue, words, pos):
     
     #print "\n Computing Confusion matrice for unknown words..."
@@ -357,6 +404,10 @@ def randResultAnalysis(tfn, model ):
             print "POS Set : ", pos
             print "POS Frequence : ", freq
             
+            correctPhrase = persCorrectPhrase(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, pos)
+            
+            print "--> : Nb Correct Phrase : ", correctPhrase
+            
             print "---> All Words : "
             conf = confMatAllWords(tfn.benchRandResultTagging, tfn.benchRandTestParsed, words, pos)
             print"\t\t - Percentage = ", float(np.trace(conf[:-1,:-1]))/np.sum(conf[:-1,:])*100
@@ -417,6 +468,7 @@ def allCrossResultAnalysis(tfn, model ):
         
         for model in models:
             
+            correctPhrase = 0
                             
             confAllWordsAllPost = 0
             confUnknWordsAllPost = 0
@@ -483,6 +535,8 @@ def allCrossResultAnalysis(tfn, model ):
                 
                 confAmbWordsMostPost += confMatAmbiguousWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, ambiguousWords, mostPos)
                 
+                correctPhrase += persCorrectPhrase(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, pos)
+           
 #             confAllWordsAllPost = confAllWordsAllPost / maxCross
 #             confUnknWordsAllPost = confUnknWordsAllPost / maxCross
 #             confKnownWordsAllPost = confKnownWordsAllPost / maxCross
@@ -492,8 +546,9 @@ def allCrossResultAnalysis(tfn, model ):
 #             confUnknownWordsMostPost = confUnknownWordsMostPost / maxCross
 #             confAmbWordsMostPost = confAmbWordsMostPost / maxCross
             
-            print "\n\n : Result : "     
-            print "---> All Words : "
+            print "\n\n : Result : "
+            print "--> : Nb Correct Phrase : ", correctPhrase
+            print "\n---> All Words : "
             print"\t\t - Percentage = ", float(np.trace(confAllWordsAllPost[:-1,:-1]))/np.sum(confAllWordsAllPost[:-1,:])*100
             print"\t\t - Nb Tested words = ",  np.sum(confAllWordsAllPost[:-1,:]) / maxCross
             
@@ -596,8 +651,10 @@ def oneCrossResultAnalysis(tfn, model, cnum ):
             
             confAmbWordsMostPost = confMatAmbiguousWords(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, ambiguousWords, mostPos)
             
-            print "\n\n : Result : "     
-            print "---> All Words : "
+            correctPhrase = persCorrectPhrase(tfn.benchCrossResultTagging, tfn.benchCrossTestParsed, words, pos)
+            print "\n\n : Result : "   
+            print "--> : Nb Correct Phrase : ", correctPhrase
+            print "\n---> All Words : "
             print"\t\t - Percentage = ", float(np.trace(confAllWordsAllPost[:-1,:-1]))/np.sum(confAllWordsAllPost[:-1,:])*100
             print"\t\t - Nb Tested words = ", np.sum(confAllWordsAllPost[:-1,:])
             
@@ -658,7 +715,7 @@ if __name__ == '__main__':
         print " missing model parameter, append BLM or HMM or SECHMM or ENN or all at same time (UPPERCASE)"
         exit()
     
-    modelW = ['BLM', 'HMM', 'SECHMM', 'ENN', 'ENN2', 'ENN3', 'ENN4']
+    modelW = ['BLM', 'HMM', 'HMM2', 'SECHMM', 'ENN', 'ENN2', 'ENN3', 'ENN4']
     
     for m in modelW :
         if m in sys.argv[5:]:

@@ -94,6 +94,13 @@ class TemplateFileName(object):
             self.hmmModelRandTagging =  self.benchTestBase + 'models/hmmModelRandTagging.pickle'
             self.hmmModelCrossTagging =  self.benchTestBase + 'models/hmmModelCrossTagging_{0}.pickle'.format(crossNum)
             
+        elif ( model.lower() == 'hmm2'):
+            self.benchTestBase = self.baseBench + 'testResult/hmm2/'
+            self.benchRandResultTagging =  self.benchTestBase + 'resultRandTagging.txt'
+            self.benchCrossResultTagging =  self.benchTestBase + 'resultCrossTagging_{0}.txt'.format(crossNum)
+            self.hmmModelRandTagging =  self.benchTestBase + 'models/hmmModelRandTagging.pickle'
+            self.hmmModelCrossTagging =  self.benchTestBase + 'models/hmmModelCrossTagging_{0}.pickle'.format(crossNum)
+            
         elif ( model.lower() == 'sechmm'):
             
             self.benchTestBase = self.baseBench + 'testResult/secoHmm/'
