@@ -547,7 +547,7 @@ def allCrossResultAnalysis(tfn, model ):
 #             confAmbWordsMostPost = confAmbWordsMostPost / maxCross
             
             print "\n\n : Result : "
-            print "--> : Nb Correct Phrase : ", correctPhrase
+            print "--> : Nb Correct Phrase : ", correctPhrase / maxCross
             print "\n---> All Words : "
             print"\t\t - Percentage = ", float(np.trace(confAllWordsAllPost[:-1,:-1]))/np.sum(confAllWordsAllPost[:-1,:])*100
             print"\t\t - Nb Tested words = ",  np.sum(confAllWordsAllPost[:-1,:]) / maxCross
