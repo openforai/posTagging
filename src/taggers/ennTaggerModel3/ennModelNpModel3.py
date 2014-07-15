@@ -391,7 +391,7 @@ class ElasticNN(object):
                             
                             self.eMlp.fwdBackwdBatch(inputs, targets, eta)                    
                     
-                            self.eMlp.weightUpdate() # used if self.eMlp.fwdBackwd2 is used above
+                        self.eMlp.weightUpdate() # used if self.eMlp.fwdBackwd2 is used above
                             
                             # End Of Iteration
                             
